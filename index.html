@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Penilaian Mahasiswi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Arabic & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            direction: rtl;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col pb-12">
+
+    <!-- Header Aplikasi -->
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-white/10 rounded-xl">
+                    <i class="fa-solid fa-calculator text-2xl text-emerald-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-wide">Kalkulator Penilaian Akademik</h1>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <p class="text-xs text-emerald-100">Berdasarkan Rubrik Filsafat & Aqidah (Skala 10 - 100)</p>
+                        <span id="db-status-badge" class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-500/30 text-amber-200 border border-amber-500/40 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Offline Mode
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab Menu -->
+            <div class="flex bg-emerald-900/40 p-1 rounded-xl w-full sm:w-auto">
+                <button onclick="switchTab('input-tab')" id="btn-input-tab" class="flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow">
+                    <i class="fa-solid fa-user-plus mr-2"></i>Input Nilai
+                </button>
+                <button onclick="switchTab('list-tab')" id="btn-list-tab" class="flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10">
+                    <i class="fa-solid fa-list-check mr-2"></i>Daftar Mahasiswi
+                    <span id="badge-count" class="ml-1 px-1.5 py-0.5 text-xs bg-emerald-500 rounded-full text-white hidden">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 flex-grow w-full">
+        <!-- Toast Notification Area -->
+        <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+        <!-- TAB 1: INPUT & KALKULATOR PENILAIAN -->
+        <div id="tab-input" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Form Input Identitas & Nilai -->
+                <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-emerald-600 text-lg"></i>
+                            <h2 class="text-lg font-bold text-slate-800" id="form-title">Form Input & Penilaian Mahasiswi</h2>
+                        </div>
+                        <button type="button" onclick="resetForm()" class="text-xs text-rose-600 hover:text-rose-700 font-medium transition flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-left"></i> Bersihkan Form
+                        </button>
+                    </div>
+
+                    <form id="calc-form" onsubmit="saveStudent(event)" class="space-y-6">
+                        <input type="hidden" id="edit-id" value="">
+                        
+                        <!-- Identitas -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nama Mahasiswi <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                        <i class="fa-solid fa-user"></i>
+                                    </span>
+                                    <input type="text" id="student-name" required placeholder="Contoh: Fatimah Az-Zahra" class="pl-10 w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">NIM / Nomor Induk</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                        <i class="fa-solid fa-id-card"></i>
+                                    </span>
+                                    <input type="text" id="student-nim" placeholder="Masukkan NIM (Opsional)" class="pl-10 w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kriteria 1: Struktur Teologis & Filosofis (40%) -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
+                            <div class="flex justify-between items-start gap-2">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md text-xs font-bold">Bobot 40%</span>
+                                    <h3 class="font-bold text-slate-800 text-sm mt-1.5">1. التركيب العقدي والفلسفي</h3>
+                                    <p class="text-xs text-slate-500">Struktur Teologis & Filosofis (Pemecahan masalah, keselarasan Akal & Wahyu)</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-2xl font-black text-emerald-700" id="val-c1">70</span>
+                                    <span class="text-xs text-slate-400">/100</span>
+                                </div>
+                            </div>
+                            <!-- Slider Nilai -->
+                            <input type="range" id="score-c1" min="10" max="100" value="70" oninput="updateScores()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                            <!-- Quick Select Rubric Range -->
+                            <div class="grid grid-cols-5 gap-1 pt-1">
+                                <button type="button" onclick="setScore('score-c1', 20)" class="text-[10px] py-1 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 rounded transition font-semibold">Dha'if<br>(10-30)</button>
+                                <button type="button" onclick="setScore('score-c1', 45)" class="text-[10px] py-1 bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 rounded transition font-semibold">Maqbul<br>(31-55)</button>
+                                <button type="button" onclick="setScore('score-c1', 65)" class="text-[10px] py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100 rounded transition font-semibold">Jayyid<br>(56-70)</button>
+                                <button type="button" onclick="setScore('score-c1', 80)" class="text-[10px] py-1 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 rounded transition font-semibold">J. Jiddan<br>(71-85)</button>
+                                <button type="button" onclick="setScore('score-c1', 95)" class="text-[10px] py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded transition font-semibold">Mumtaz<br>(86-100)</button>
+                            </div>
+                        </div>
+
+                        <!-- Kriteria 2: Aplikasi Istilah Ilmiah (30%) -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
+                            <div class="flex justify-between items-start gap-2">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-teal-100 text-teal-800 rounded-md text-xs font-bold">Bobot 30%</span>
+                                    <h3 class="font-bold text-slate-800 text-sm mt-1.5">2. التطبيق الاصطلاحي</h3>
+                                    <p class="text-xs text-slate-500">Penerapan Istilah Ilmiah (Penggunaan istilah wajib dalam tulisan)</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-2xl font-black text-teal-700" id="val-c2">70</span>
+                                    <span class="text-xs text-slate-400">/100</span>
+                                </div>
+                            </div>
+                            <!-- Slider Nilai -->
+                            <input type="range" id="score-c2" min="10" max="100" value="70" oninput="updateScores()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600">
+                            <!-- Quick Select Rubric Range -->
+                            <div class="grid grid-cols-5 gap-1 pt-1">
+                                <button type="button" onclick="setScore('score-c2', 20)" class="text-[10px] py-1 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 rounded transition font-semibold">Dha'if<br>(10-30)</button>
+                                <button type="button" onclick="setScore('score-c2', 45)" class="text-[10px] py-1 bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 rounded transition font-semibold">Maqbul<br>(31-55)</button>
+                                <button type="button" onclick="setScore('score-c2', 65)" class="text-[10px] py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100 rounded transition font-semibold">Jayyid<br>(56-70)</button>
+                                <button type="button" onclick="setScore('score-c2', 80)" class="text-[10px] py-1 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 rounded transition font-semibold">J. Jiddan<br>(71-85)</button>
+                                <button type="button" onclick="setScore('score-c2', 95)" class="text-[10px] py-1 bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 rounded transition font-semibold">Mumtaz<br>(86-100)</button>
+                            </div>
+                        </div>
+
+                        <!-- Kriteria 3: Keserasian Bahasa & Sintaksis (30%) -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
+                            <div class="flex justify-between items-start gap-2">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-cyan-100 text-cyan-800 rounded-md text-xs font-bold">Bobot 30%</span>
+                                    <h3 class="font-bold text-slate-800 text-sm mt-1.5">3. السبك اللغوي والنحو</h3>
+                                    <p class="text-xs text-slate-500">Struktur Bahasa & Nahwu (Formulasi kalimat, ketepatan I'rab & Imla)</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-2xl font-black text-cyan-700" id="val-c3">70</span>
+                                    <span class="text-xs text-slate-400">/100</span>
+                                </div>
+                            </div>
+                            <!-- Slider Nilai -->
+                            <input type="range" id="score-c3" min="10" max="100" value="70" oninput="updateScores()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-600">
+                            <!-- Quick Select Rubric Range -->
+                            <div class="grid grid-cols-5 gap-1 pt-1">
+                                <button type="button" onclick="setScore('score-c3', 20)" class="text-[10px] py-1 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 rounded transition font-semibold">Dha'if<br>(10-30)</button>
+                                <button type="button" onclick="setScore('score-c3', 45)" class="text-[10px] py-1 bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 rounded transition font-semibold">Maqbul<br>(31-55)</button>
+                                <button type="button" onclick="setScore('score-c3', 65)" class="text-[10px] py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100 rounded transition font-semibold">Jayyid<br>(56-70)</button>
+                                <button type="button" onclick="setScore('score-c3', 80)" class="text-[10px] py-1 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 rounded transition font-semibold">J. Jiddan<br>(71-85)</button>
+                                <button type="button" onclick="setScore('score-c3', 95)" class="text-[10px] py-1 bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100 rounded transition font-semibold">Mumtaz<br>(86-100)</button>
+                            </div>
+                        </div>
+
+                        <!-- Button Aksi -->
+                        <div class="flex gap-3 pt-2">
+                            <button type="submit" id="btn-submit" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bagian Live Hasil Kalkulasi & Panduan Rubrik Dinamis -->
+                <div class="lg:col-span-5 flex flex-col gap-6">
+                    
+                    <!-- Card Nilai Akhir -->
+                    <div class="bg-gradient-to-br from-emerald-900 to-teal-800 text-white p-6 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+                        <!-- Background Accent Pattern -->
+                        <div class="absolute right-0 bottom-0 opacity-10 translate-x-4 translate-y-4">
+                            <i class="fa-solid fa-graduation-cap text-[180px]"></i>
+                        </div>
+                        
+                        <div class="z-10">
+                            <span class="text-emerald-300 text-xs font-bold uppercase tracking-wider">Hasil Perhitungan Berjalan</span>
+                            <h3 class="text-white/80 text-sm mt-0.5" id="live-student-display">Untuk: Belum Ada Nama</h3>
+                        </div>
+
+                        <div class="my-4 z-10 flex items-baseline gap-1">
+                            <span class="text-6xl font-black tracking-tight" id="live-final-score">70.0</span>
+                            <span class="text-xl text-emerald-300">/ 100</span>
+                        </div>
+
+                        <div class="flex items-center justify-between z-10 bg-white/10 p-3 rounded-xl border border-white/10 backdrop-blur-sm">
+                            <div>
+                                <div class="text-[10px] text-emerald-200 uppercase tracking-widest font-bold">Kategori Nilai</div>
+                                <div class="text-lg font-black" id="live-grade-category">جَيِّدٌ (Bagus)</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-emerald-200 uppercase tracking-widest font-bold">Bobot Nilai</div>
+                                <div class="text-xs mt-1" id="live-weight-details">28.0 + 21.0 + 21.0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panduan Rubrik Dinamis -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex-grow flex flex-col">
+                        <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
+                            <i class="fa-solid fa-book-open text-teal-600 text-lg"></i>
+                            <h3 class="font-bold text-slate-800 text-sm">Deskripsi Indikator Berjalan</h3>
+                        </div>
+
+                        <!-- Konten Deskripsi Rubrik yang berubah dinamis sesuai nilai slider -->
+                        <div class="space-y-4 flex-grow overflow-y-auto max-h-[360px] pr-1">
+                            
+                            <!-- Rubrik K1 -->
+                            <div class="border-l-4 border-emerald-500 pl-3 py-1 space-y-1">
+                                <span class="text-[10px] font-bold text-emerald-600 uppercase">Kriteria 1 - Teologi & Filsafat</span>
+                                <div class="arabic-text text-lg text-emerald-950 font-bold leading-relaxed text-right py-1 bg-emerald-50/50 px-2.5 rounded-lg" id="rubric-desc-c1-ar">
+                                    تَقْدِيمُ حَلَّ سَطْحِي لِلْمُشْكِلَةِ دُونَ رَبْطَ قَوِيٌّ بَيْنَ العَقْلِ وَالْوَحْيِ.
+                                </div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c1-id">
+                                    Menyajikan solusi dangkal untuk masalah tersebut tanpa hubungan yang kuat antara akal dan wahyu.
+                                </p>
+                            </div>
+
+                            <!-- Rubrik K2 -->
+                            <div class="border-l-4 border-teal-500 pl-3 py-1 space-y-1">
+                                <span class="text-[10px] font-bold text-teal-600 uppercase">Kriteria 2 - Istilah Ilmiah</span>
+                                <div class="arabic-text text-lg text-teal-950 font-bold leading-relaxed text-right py-1 bg-teal-50/50 px-2.5 rounded-lg" id="rubric-desc-c2-ar">
+                                    اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.
+                                </div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c2-id">
+                                    Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun ide/gagasan.
+                                </p>
+                            </div>
+
+                            <!-- Rubrik K3 -->
+                            <div class="border-l-4 border-cyan-500 pl-3 py-1 space-y-1">
+                                <span class="text-[10px] font-bold text-cyan-600 uppercase">Kriteria 3 - Struktur Bahasa & Nahwu</span>
+                                <div class="arabic-text text-lg text-cyan-950 font-bold leading-relaxed text-right py-1 bg-cyan-50/50 px-2.5 rounded-lg" id="rubric-desc-c3-ar">
+                                    جُمَلٌ بَسِيطَةٌ جِدًّا مَعَ تَكْرَارِ الأَخْطَاءِ فِي حَرَكَاتِ الإِعْرَابِ كَالْمَرْفُوعَاتِ وَالمَجْرُورَاتِ.
+                                </div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c3-id">
+                                    Kalimat yang sangat sederhana disertai dengan pengulangan kesalahan dalam tanda I'rab (seperti marfu'at dan majrurat).
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DAFTAR MAHASISWI & STATISTIK -->
+        <div id="tab-list" class="space-y-6 hidden">
+            <!-- Ringkasan Statistik Kelas -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Mahasiswi</div>
+                        <div class="text-xl sm:text-2xl font-black text-slate-800 mt-1" id="stat-total">0</div>
+                    </div>
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-users text-lg"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Rata-rata Nilai</div>
+                        <div class="text-xl sm:text-2xl font-black text-slate-800 mt-1" id="stat-average">0.0</div>
+                    </div>
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-calculator text-lg"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Nilai Tertinggi</div>
+                        <div class="text-xl sm:text-2xl font-black text-emerald-600 mt-1" id="stat-max">0</div>
+                    </div>
+                    <div class="p-3 bg-teal-50 text-teal-600 rounded-lg"><i class="fa-solid fa-trophy text-lg"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Nilai Terendah</div>
+                        <div class="text-xl sm:text-2xl font-black text-rose-600 mt-1" id="stat-min">0</div>
+                    </div>
+                    <div class="p-3 bg-rose-50 text-rose-600 rounded-lg"><i class="fa-solid fa-circle-down text-lg"></i></div>
+                </div>
+            </div>
+
+            <!-- Distribusi Kelulusan/Pencapaian Rubrik -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-emerald-600"></i> Sebaran Kategori Nilai Mahasiswi
+                </h3>
+                <div class="grid grid-cols-5 gap-2" id="distribution-container">
+                    <div class="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-emerald-800">Mumtaz (86-100)</div>
+                        <div class="text-lg font-black text-emerald-700 mt-1" id="dist-mumtaz">0</div>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-100 p-2 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-blue-800">Jayyid Jiddan (71-85)</div>
+                        <div class="text-lg font-black text-blue-700 mt-1" id="dist-jj">0</div>
+                    </div>
+                    <div class="bg-yellow-50 border border-yellow-100 p-2 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-yellow-800">Jayyid (56-70)</div>
+                        <div class="text-lg font-black text-yellow-700 mt-1" id="dist-jayyid">0</div>
+                    </div>
+                    <div class="bg-orange-50 border border-orange-100 p-2 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-orange-800">Maqbul (31-55)</div>
+                        <div class="text-lg font-black text-orange-700 mt-1" id="dist-maqbul">0</div>
+                    </div>
+                    <div class="bg-red-50 border border-red-100 p-2 rounded-xl text-center">
+                        <div class="text-[10px] font-bold text-red-800">Dha'if (10-30)</div>
+                        <div class="text-lg font-black text-red-700 mt-1" id="dist-dhaif">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kontrol Tabel, Pencarian, & Ekspor -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                    <div class="relative flex-grow max-w-md">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                        </span>
+                        <input type="text" id="search-input" placeholder="Cari berdasarkan nama atau NIM..." class="pl-9 w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportToCSV()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-xl text-xs sm:text-sm shadow-sm transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-excel"></i> Ekspor CSV/Excel
+                        </button>
+                        <button onclick="confirmClearAll()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold py-2 px-4 rounded-xl text-xs sm:text-sm border border-rose-200 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i> Hapus Semua Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daftar Card (Tampilan Mobile) & Tabel (Tampilan Desktop) -->
+                <!-- Desktop Table View -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                                <th class="py-4 px-6">Identitas</th>
+                                <th class="py-4 px-6 text-center">Filsafat (40%)</th>
+                                <th class="py-4 px-6 text-center">Istilah (30%)</th>
+                                <th class="py-4 px-6 text-center">Bahasa (30%)</th>
+                                <th class="py-4 px-6 text-center">Skor Akhir</th>
+                                <th class="py-4 px-6 text-center">Kategori</th>
+                                <th class="py-4 px-6 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body" class="divide-y divide-slate-100 text-slate-700 text-sm">
+                            <!-- Diisi oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Grid Card View -->
+                <div id="student-cards-container" class="md:hidden p-4 space-y-4">
+                    <!-- Diisi oleh JS -->
+                </div>
+
+                <!-- State Kosong -->
+                <div id="empty-state" class="p-12 text-center space-y-3 hidden">
+                    <div class="text-slate-300"><i class="fa-solid fa-folder-open text-6xl"></i></div>
+                    <p class="text-slate-500 font-medium">Belum ada data nilai mahasiswi.</p>
+                    <button onclick="switchTab('input-tab')" class="text-emerald-700 hover:text-emerald-800 font-semibold text-sm underline flex items-center justify-center gap-1 mx-auto">
+                        <i class="fa-solid fa-plus-circle"></i> Mulai Input Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Konfirmasi Hapus Data Semua -->
+    <div id="delete-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
+            <div class="text-rose-600 bg-rose-50 w-12 h-12 rounded-full flex items-center justify-center text-2xl mx-auto">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="text-center">
+                <h3 class="font-bold text-slate-800 text-lg">Hapus Semua Data?</h3>
+                <p class="text-slate-500 text-xs mt-2">Semua data mahasiswi yang tersimpan akan terhapus secara permanen. Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
+                <button onclick="clearAllData()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm rounded-xl shadow transition">Ya, Hapus Semua</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Imports & Main Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Kamus Rubrik Penilaian
+        const rubricData = {
+            c1: {
+                dhaif: {
+                    ar: "عَدَمُ فَهُمِ الْمُشْكِلَةِ الْفَلْسَفِيَّةِ نِهَائِياً، أَو الكِتَابَةِ خَارِجَ المَوْضُوعِ دُونَ إِظْهَارِ أَي قُدْرَةٍ عَلَى التَّحْلِيلِ مِنَ النَّصِ.",
+                    id: "Tidak memahami masalah filsafat sama sekali, atau menulis di luar topik tanpa menunjukkan kemampuan analisis apa pun dari teks."
+                },
+                maqbul: {
+                    ar: "نَقْلُ العِبَارَاتِ دُونَ تَوْفِيقٍ.",
+                    id: "Hanya menyalin atau memindahkan kalimat-kalimat yang ada tanpa upaya penyesuaian yang tepat."
+                },
+                jayyid: {
+                    ar: "تَقْدِيمُ حَلَّ سَطْحِي لِلْمُشْكِلَةِ دُونَ رَبْطَ قَوِيٌّ بَيْنَ العَقْلِ وَالْوَحْيِ.",
+                    id: "Menyajikan solusi yang dangkal atas masalah tersebut tanpa adanya hubungan yang kuat antara akal (rasio) dan wahyu."
+                },
+                jayyid_jiddan: {
+                    ar: "فَهُمْ صَحِيحٌ لِلْمُشْكِلَةِ مَعَ صِيَاغَةِ حَلَّ مَقْبُولٍ دُونَ تَفْصِيلٍ عَمِيقٍ مَنْطِقِي.",
+                    id: "Pemahaman yang benar terhadap masalah disertai formulasi solusi yang dapat diterima, namun tanpa rincian logis yang mendalam."
+                },
+                mumtaz: {
+                    ar: "قُدْرَةٌ عَالِيَةٌ عَلَى حَلَّ التَّعَارُضِ عَقْلِياً، وَالالْتِزَامِ بِفِكْرَةِ أَنَّ العَقْلَ أَسَسُ النَّقْلِ بِعُمْقٍ.",
+                    id: "Kemampuan sangat tinggi dalam memecahkan kontradiksi secara rasional, serta berkomitmen secara mendalam pada gagasan bahwa akal adalah landasan bagi naql (teks wahyu)."
+                }
+            },
+            c2: {
+                dhaif: {
+                    ar: "خُلُو الوَرَقَةِ تَمَاماً مِنَ الْمُصْطَلَحَاتِ الْعِلْمِيَّةِ المَطْلُوبَةِ.",
+                    id: "Lembar jawaban sama sekali tidak memuat istilah-istilah ilmiah yang diwajibkan."
+                },
+                maqbul: {
+                    ar: "ذِكْرُ الْمُصْطَلَحَاتِ كَكَلِمَاتٍ مُفْرَدَةِ دُونَ إِدْخَالِهَا فِي جُمَلٍ مُفِيدَةٍ.",
+                    id: "Hanya menyebutkan istilah-istilah sebagai kata tunggal terpisah tanpa memasukkannya ke dalam kalimat yang bermakna."
+                },
+                jayyid: {
+                    ar: "اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.",
+                    id: "Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun alur ide/gagasan."
+                },
+                jayyid_jiddan: {
+                    ar: "اسْتِخْدَامُ مُصْطَلَحَيْنِ فَقَطْ بِشَكْلٍ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ.",
+                    id: "Hanya menggunakan dua istilah saja, namun keduanya telah diletakkan secara benar dan tepat dalam ekspresi kalimat."
+                },
+                mumtaz: {
+                    ar: "اسْتِخْدَامُ جَمِيعِ الْمُصْطَلَحَاتِ (قَانُوناً كلياً، تَأْوِيلِ النَّصِ، أَسَسُ النَّقْلِ) فِي سِيَاقِهَا الصحيح دائماً.",
+                    id: "Menggunakan semua istilah wajib (qanunan kulliyan, ta'wilin nass, asasun naql) dalam konteks kalimat yang selalu benar dan tepat."
+                }
+            },
+            c3: {
+                dhaif: {
+                    ar: "الاعْتِمَادُ عَلَى كَلِمَاتٍ مُتَقَطِعَةٍ، مَعَ كَثْرَةِ الْأَخْطَاءِ الَّتِي تُفْسِدُ البِنَاءَ اللغوي.",
+                    id: "Sangat bergantung pada kata-kata yang terputus-putus dengan banyak kesalahan fatal yang merusak struktur bahasa."
+                },
+                maqbul: {
+                    ar: "رَكَاكَةٌ شَدِيدَةٌ فِي تَرَاكِيبِ الْجُمَلِ مَعَ صُعُوبَةِ فَهُمِ المعنى المَقْصُودِ لُغَوِياً.",
+                    id: "Kelemahan atau kekakuan yang sangat parah pada struktur kalimat sehingga makna linguistik yang dimaksud sulit dipahami."
+                },
+                jayyid: {
+                    ar: "جُمَلٌ بَسِيطَةٌ جِدًّا مَعَ تَكْرَارِ الأَخْطَاءِ فِي حَرَكَاتِ الإِعْرَابِ كَالْمَرْفُوعَاتِ وَالمَجْرُورَاتِ.",
+                    id: "Menggunakan kalimat-kalimat yang sangat sederhana namun sering melakukan kesalahan pada tanda I'rab (seperti marfu'at dan majrurat)."
+                },
+                jayyid_jiddan: {
+                    ar: "صِيَاغَةُ جُمَلٍ مُرَكَّبَةٍ جَيِّدَةٌ مَعَ وُجُودِ خَطَأَ نَحْوِي أَوْ إِمْلَائِي وَاحِدٍ أَوْ اثْنَيْنِ فَقَطْ.",
+                    id: "Menyusun kalimat majemuk dengan baik dengan hanya ditemukannya satu atau maksimal dua kesalahan tata bahasa (nahwu) atau ejaan (imla)."
+                },
+                mumtaz: {
+                    ar: "كِتَابَةٌ لُغَوِيَّةٌ بَلِيغَةٍ، خَالِيَةٍ تَمَاماً مِنَ الأَخْطَاءِ النَّحْوِيَّةِ وَالإِمْلَائِيَّةِ.",
+                    id: "Penulisan gaya bahasa yang indah/baligh, serta sepenuhnya bersih dari kesalahan tata bahasa (nahwu) maupun ejaan (imla)."
+                }
+            }
+        };
+
+        // Database & Konfigurasi Firebase
+        let students = [];
+        let isFirebaseActive = false;
+        let db = null;
+        let auth = null;
+        let appId = typeof __app_id !== 'undefined' ? __app_id : 'kalkulator-penilaian-mahasiswi';
+
+        // DETEKSI CONFIG FIREBASE
+        // Ketika Anda meng-online-kan aplikasi secara mandiri, Anda cukup mengisi kunci konfigurasi Firebase di sini:
+        const myFirebaseConfig = {
+            apiKey: "",          // GANTI DENGAN API KEY FIREBASE ANDA
+            authDomain: "",      // GANTI DENGAN AUTH DOMAIN FIREBASE ANDA
+            projectId: "",       // GANTI DENGAN PROJECT ID FIREBASE ANDA
+            storageBucket: "",   // GANTI DENGAN STORAGE BUCKET FIREBASE ANDA
+            messagingSenderId: "", // GANTI DENGAN MESSAGING SENDER ID FIREBASE ANDA
+            appId: ""            // GANTI DENGAN APP ID FIREBASE ANDA
+        };
+
+        // Gunakan config platform otomatis jika ada, jika tidak, gunakan config user di atas
+        let finalConfig = null;
+        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+            finalConfig = JSON.parse(__firebase_config);
+        } else if (myFirebaseConfig.apiKey) {
+            finalConfig = myFirebaseConfig;
+        }
+
+        // Jalankan Inisialisasi Database
+        async function initializeDatabase() {
+            const statusBadge = document.getElementById('db-status-badge');
+            
+            if (finalConfig) {
+                try {
+                    const app = initializeApp(finalConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    // Autentikasi terlebih dahulu sebelum melakukan kueri (Sesuai Aturan Firebase SDK)
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            isFirebaseActive = true;
+                            statusBadge.className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-500/40 flex items-center gap-1";
+                            statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online Database`;
+                            
+                            // Ambil data real-time menggunakan onSnapshot dengan pengaman Strict Paths (Aturan 1 & 3)
+                            const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'mahasiswi_grades');
+                            onSnapshot(collRef, (snapshot) => {
+                                students = [];
+                                snapshot.forEach((doc) => {
+                                    students.push({ id: doc.id, ...doc.data() });
+                                });
+                                renderStudents();
+                                updateStats();
+                            }, (error) => {
+                                console.error("Firestore Error:", error);
+                                showToast("Gagal memuat data dari database cloud.");
+                            });
+                        }
+                    });
+                } catch (e) {
+                    console.error("Gagal menghubungkan Firebase:", e);
+                    fallbackToLocalStorage();
+                }
+            } else {
+                fallbackToLocalStorage();
+            }
+        }
+
+        function fallbackToLocalStorage() {
+            isFirebaseActive = false;
+            const savedData = localStorage.getItem('mahasiswi_grades');
+            if (savedData) {
+                students = JSON.parse(savedData);
+            }
+            renderStudents();
+            updateStats();
+        }
+
+        // Fungsi berpindah tab menu
+        function switchTab(tabId) {
+            const tabInput = document.getElementById('tab-input');
+            const tabList = document.getElementById('tab-list');
+            const btnInput = document.getElementById('btn-input-tab');
+            const btnList = document.getElementById('btn-list-tab');
+
+            if (tabId === 'input-tab') {
+                tabInput.classList.remove('hidden');
+                tabList.classList.add('hidden');
+                btnInput.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow";
+                btnList.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10";
+            } else {
+                tabInput.classList.add('hidden');
+                tabList.classList.remove('hidden');
+                btnList.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow";
+                btnInput.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10";
+            }
+        }
+
+        // Shortcut Set Nilai dari tombol cepat rubrik
+        function setScore(id, value) {
+            document.getElementById(id).value = value;
+            updateScores();
+        }
+
+        // Mengambil kategori penilaian berdasarkan standar rubrik
+        function getCategoryDetails(score) {
+            if (score >= 86 && score <= 100) return { name: "مُمْتَازٌ (Mumtaz)", class: "bg-emerald-100 text-emerald-800 border-emerald-200", badge: "bg-emerald-600", key: "mumtaz" };
+            if (score >= 71 && score <= 85) return { name: "جَيِّدٌ جِدًا (Jayyid Jiddan)", class: "bg-blue-100 text-blue-800 border-blue-200", badge: "bg-blue-600", key: "jayyid_jiddan" };
+            if (score >= 56 && score <= 70) return { name: "جَيِّدٌ (Jayyid)", class: "bg-yellow-100 text-yellow-800 border-yellow-200", badge: "bg-yellow-600", key: "jayyid" };
+            if (score >= 31 && score <= 55) return { name: "مَقْبُولٌ (Maqbul)", class: "bg-orange-100 text-orange-800 border-orange-200", badge: "bg-orange-600", key: "maqbul" };
+            return { name: "ضَعِيفٌ (Dha'if)", class: "bg-red-100 text-red-800 border-red-200", badge: "bg-red-600", key: "dhaif" };
+        }
+
+        // Live calculation & Sinkronisasi tampilan deskripsi berjalan
+        function updateScores() {
+            const name = document.getElementById('student-name').value.trim() || "Belum Ada Nama";
+            const c1 = parseInt(document.getElementById('score-c1').value);
+            const c2 = parseInt(document.getElementById('score-c2').value);
+            const c3 = parseInt(document.getElementById('score-c3').value);
+
+            // Update Label Skor di atas slider
+            document.getElementById('val-c1').innerText = c1;
+            document.getElementById('val-c2').innerText = c2;
+            document.getElementById('val-c3').innerText = c3;
+
+            // Hitung Bobot Kriteria
+            const w1 = c1 * 0.40;
+            const w2 = c2 * 0.30;
+            const w3 = c3 * 0.30;
+            const total = w1 + w2 + w3;
+
+            // Update Tampilan Card Berjalan
+            document.getElementById('live-student-display').innerText = `Untuk: ${name}`;
+            document.getElementById('live-final-score').innerText = total.toFixed(1);
+            document.getElementById('live-weight-details').innerText = `${w1.toFixed(1)} + ${w2.toFixed(1)} + ${w3.toFixed(1)}`;
+            
+            const cat = getCategoryDetails(total);
+            document.getElementById('live-grade-category').innerText = cat.name;
+
+            // Update deskripsi rubrik dinamis (K1)
+            const catC1 = getCategoryDetails(c1).key;
+            document.getElementById('rubric-desc-c1-ar').innerText = rubricData.c1[catC1].ar;
+            document.getElementById('rubric-desc-c1-id').innerText = rubricData.c1[catC1].id;
+
+            // Update deskripsi rubrik dinamis (K2)
+            const catC2 = getCategoryDetails(c2).key;
+            document.getElementById('rubric-desc-c2-ar').innerText = rubricData.c2[catC2].ar;
+            document.getElementById('rubric-desc-c2-id').innerText = rubricData.c2[catC2].id;
+
+            // Update deskripsi rubrik dinamis (K3)
+            const catC3 = getCategoryDetails(c3).key;
+            document.getElementById('rubric-desc-c3-ar').innerText = rubricData.c3[catC3].ar;
+            document.getElementById('rubric-desc-c3-id').innerText = rubricData.c3[catC3].id;
+        }
+
+        // Bersihkan Form Input
+        function resetForm() {
+            document.getElementById('calc-form').reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-circle-info text-emerald-600 text-lg"></i> Form Input & Penilaian Mahasiswi`;
+            document.getElementById('btn-submit').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian`;
+            updateScores();
+        }
+
+        // Simpan Data Nilai Mahasiswi (Online/Lokal)
+        async function saveStudent(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('student-name').value.trim();
+            const nim = document.getElementById('student-nim').value.trim() || "-";
+            const c1 = parseInt(document.getElementById('score-c1').value);
+            const c2 = parseInt(document.getElementById('score-c2').value);
+            const c3 = parseInt(document.getElementById('score-c3').value);
+            const finalScore = (c1 * 0.40) + (c2 * 0.30) + (c3 * 0.30);
+            const editId = document.getElementById('edit-id').value;
+
+            if (!name) return;
+
+            if (isFirebaseActive && db && auth.currentUser) {
+                // PENYIMPANAN ONLINE (FIRESTORE)
+                try {
+                    const id = editId || 'student_' + Date.now();
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mahasiswi_grades', id);
+                    const dataPayload = { name, nim, c1, c2, c3, finalScore, timestamp: new Date().toISOString() };
+                    
+                    await setDoc(docRef, dataPayload);
+                    showToast(editId ? "Nilai berhasil diperbarui di cloud!" : "Nilai baru berhasil disimpan ke cloud!");
+                } catch (err) {
+                    console.error("Gagal simpan ke cloud:", err);
+                    showToast("Gagal menyimpan ke cloud. Coba lagi.");
+                }
+            } else {
+                // PENYIMPANAN LOKAL (FALLBACK)
+                if (editId) {
+                    const index = students.findIndex(s => s.id === editId);
+                    if (index !== -1) {
+                        students[index] = { id: editId, name, nim, c1, c2, c3, finalScore };
+                        showToast("Nilai berhasil diperbarui di memori lokal!");
+                    }
+                } else {
+                    const id = 'student_' + Date.now();
+                    students.push({ id, name, nim, c1, c2, c3, finalScore });
+                    showToast("Nilai berhasil disimpan di memori lokal!");
+                }
+                localStorage.setItem('mahasiswi_grades', JSON.stringify(students));
+                renderStudents();
+                updateStats();
+            }
+
+            resetForm();
+            switchTab('list-tab');
+        }
+
+        // Memuat ulang daftar mahasiswi
+        function renderStudents() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const tableBody = document.getElementById('student-table-body');
+            const cardContainer = document.getElementById('student-cards-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            tableBody.innerHTML = '';
+            cardContainer.innerHTML = '';
+
+            const filtered = students.filter(s => 
+                (s.name && s.name.toLowerCase().includes(query)) || 
+                (s.nim && s.nim.toLowerCase().includes(query))
+            );
+
+            document.getElementById('badge-count').innerText = students.length;
+            if (students.length > 0) {
+                document.getElementById('badge-count').classList.remove('hidden');
+            } else {
+                document.getElementById('badge-count').classList.add('hidden');
+            }
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            // Urutkan nilai tertinggi ke terendah secara default
+            filtered.sort((a,b) => b.finalScore - a.finalScore);
+
+            filtered.forEach(s => {
+                const cat = getCategoryDetails(s.finalScore);
+
+                // Baris Tabel Desktop
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition duration-150";
+                tr.innerHTML = `
+                    <td class="py-4 px-6">
+                        <div class="font-bold text-slate-800">${s.name}</div>
+                        <div class="text-xs text-slate-400 font-mono mt-0.5"><i class="fa-solid fa-id-card"></i> ${s.nim}</div>
+                    </td>
+                    <td class="py-4 px-6 text-center font-semibold text-slate-700">${s.c1} <span class="text-[10px] text-slate-400 block font-normal">Bobot: ${(s.c1*0.4).toFixed(1)}</span></td>
+                    <td class="py-4 px-6 text-center font-semibold text-slate-700">${s.c2} <span class="text-[10px] text-slate-400 block font-normal">Bobot: ${(s.c2*0.3).toFixed(1)}</span></td>
+                    <td class="py-4 px-6 text-center font-semibold text-slate-700">${s.c3} <span class="text-[10px] text-slate-400 block font-normal">Bobot: ${(s.c3*0.3).toFixed(1)}</span></td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="text-lg font-black text-emerald-800">${s.finalScore.toFixed(1)}</span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="px-3 py-1.5 rounded-xl text-xs font-bold border ${cat.class}">
+                            ${cat.name}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="editStudent('${s.id}')" class="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition" title="Edit Nilai">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteStudent('${s.id}')" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Hapus Data">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+
+                // Card Tampilan Mobile
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 space-y-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-base leading-tight">${s.name}</h4>
+                            <span class="text-xs text-slate-400 font-mono mt-1 block"><i class="fa-solid fa-id-card"></i> ${s.nim}</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-emerald-800">${s.finalScore.toFixed(1)}</div>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border block mt-1 ${cat.class}">${cat.name}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-lg text-center text-xs">
+                        <div>
+                            <span class="text-slate-400 block text-[9px] uppercase font-bold">1. Filsafat (40%)</span>
+                            <span class="font-semibold text-slate-700">${s.c1}</span> <span class="text-slate-400 text-[10px]">(${(s.c1*0.4).toFixed(1)})</span>
+                        </div>
+                        <div class="border-x border-slate-200">
+                            <span class="text-slate-400 block text-[9px] uppercase font-bold">2. Istilah (30%)</span>
+                            <span class="font-semibold text-slate-700">${s.c2}</span> <span class="text-slate-400 text-[10px]">(${(s.c2*0.3).toFixed(1)})</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[9px] uppercase font-bold">3. Bahasa (30%)</span>
+                            <span class="font-semibold text-slate-700">${s.c3}</span> <span class="text-slate-400 text-[10px]">(${(s.c3*0.3).toFixed(1)})</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 justify-end pt-1">
+                        <button onclick="editStudent('${s.id}')" class="flex-1 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                        <button onclick="deleteStudent('${s.id}')" class="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-lg transition" title="Hapus">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                cardContainer.appendChild(card);
+            });
+        }
+
+        // Update Statistik dan Sebaran Kategori Nilai
+        function updateStats() {
+            const count = students.length;
+            if (count === 0) {
+                document.getElementById('stat-total').innerText = '0';
+                document.getElementById('stat-average').innerText = '0.0';
+                document.getElementById('stat-max').innerText = '0';
+                document.getElementById('stat-min').innerText = '0';
+                document.getElementById('dist-mumtaz').innerText = '0';
+                document.getElementById('dist-jj').innerText = '0';
+                document.getElementById('dist-jayyid').innerText = '0';
+                document.getElementById('dist-maqbul').innerText = '0';
+                document.getElementById('dist-dhaif').innerText = '0';
+                return;
+            }
+
+            let sum = 0;
+            let max = 0;
+            let min = 100;
+
+            let dist = { mumtaz: 0, jayyid_jiddan: 0, jayyid: 0, maqbul: 0, dhaif: 0 };
+
+            students.forEach(s => {
+                const score = s.finalScore;
+                sum += score;
+                if (score > max) max = score;
+                if (score < min) min = score;
+
+                // Distribusi kategori
+                const cat = getCategoryDetails(score).key;
+                dist[cat] = (dist[cat] || 0) + 1;
+            });
+
+            document.getElementById('stat-total').innerText = count;
+            document.getElementById('stat-average').innerText = (sum / count).toFixed(1);
+            document.getElementById('stat-max').innerText = max.toFixed(1);
+            document.getElementById('stat-min').innerText = min.toFixed(1);
+
+            document.getElementById('dist-mumtaz').innerText = dist.mumtaz;
+            document.getElementById('dist-jj').innerText = dist.jayyid_jiddan;
+            document.getElementById('dist-jayyid').innerText = dist.jayyid;
+            document.getElementById('dist-maqbul').innerText = dist.maqbul;
+            document.getElementById('dist-dhaif').innerText = dist.dhaif;
+        }
+
+        // Muat Data Kembali ke Form untuk Diubah
+        function editStudent(id) {
+            const item = students.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('student-name').value = item.name;
+            document.getElementById('student-nim').value = item.nim === '-' ? '' : item.nim;
+            
+            document.getElementById('score-c1').value = item.c1;
+            document.getElementById('score-c2').value = item.c2;
+            document.getElementById('score-c3').value = item.c3;
+
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-emerald-600 text-lg"></i> Ubah Penilaian Mahasiswi`;
+            document.getElementById('btn-submit').innerHTML = `<i class="fa-solid fa-check"></i> Perbarui Penilaian`;
+
+            updateScores();
+            switchTab('input-tab');
+            showToast(`Form diisi dengan data ${item.name}`);
+        }
+
+        // Menghapus Data Mahasiswi Individu
+        async function deleteStudent(id) {
+            const item = students.find(s => s.id === id);
+            if (!item) return;
+
+            if (isFirebaseActive && db && auth.currentUser) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mahasiswi_grades', id);
+                    await deleteDoc(docRef);
+                    showToast(`Data ${item.name} berhasil dihapus dari cloud!`);
+                } catch (err) {
+                    console.error("Gagal menghapus data online:", err);
+                    showToast("Gagal menghapus dari database online.");
+                }
+            } else {
+                students = students.filter(s => s.id !== id);
+                localStorage.setItem('mahasiswi_grades', JSON.stringify(students));
+                renderStudents();
+                updateStats();
+                showToast(`Data ${item.name} berhasil dihapus dari memori lokal!`);
+            }
+        }
+
+        // Buka Modal Konfirmasi Hapus Masal
+        function confirmClearAll() {
+            if (students.length === 0) {
+                showToast("Tidak ada data untuk dihapus.");
+                return;
+            }
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        // Tutup Modal Konfirmasi
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        // Bersihkan Seluruh Data
+        async function clearAllData() {
+            if (isFirebaseActive && db && auth.currentUser) {
+                try {
+                    showToast("Sedang menghapus semua data di cloud...");
+                    for (const s of students) {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mahasiswi_grades', s.id);
+                        await deleteDoc(docRef);
+                    }
+                    showToast("Semua data berhasil dibersihkan dari cloud!");
+                } catch (err) {
+                    console.error(err);
+                    showToast("Ada kendala saat menghapus data online.");
+                }
+            } else {
+                students = [];
+                localStorage.removeItem('mahasiswi_grades');
+                renderStudents();
+                updateStats();
+                showToast("Semua data lokal telah berhasil dibersihkan.");
+            }
+            closeDeleteModal();
+        }
+
+        // Membuat Notification Toast Elegan
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "bg-slate-800 text-white px-4 py-3 rounded-xl shadow-lg border border-slate-700 flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0 text-xs sm:text-sm font-medium pointer-events-auto";
+            toast.innerHTML = `
+                <i class="fa-solid fa-circle-info text-emerald-400 text-base"></i>
+                <span>${message}</span>
+                <button class="text-white/60 hover:text-white ml-auto"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            
+            // Pasang event penutup manual
+            toast.querySelector('button').addEventListener('click', () => {
+                toast.remove();
+            });
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Ekspor Rekap Nilai ke File CSV
+        function exportToCSV() {
+            if (students.length === 0) {
+                showToast("Belum ada data untuk diekspor!");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; // BOM untuk UTF-8 agar huruf Arab & I'rab terbaca di Excel
+            csvContent += "NIM,Nama Mahasiswi,1. Teologi & Filsafat (40%),2. Istilah Ilmiah (30%),3. Bahasa & Nahwu (30%),Skor Akhir,Kategori\n";
+
+            students.forEach(s => {
+                const cat = getCategoryDetails(s.finalScore).name;
+                const row = [
+                    `"${s.nim}"`,
+                    `"${s.name}"`,
+                    s.c1,
+                    s.c2,
+                    s.c3,
+                    s.finalScore.toFixed(1),
+                    `"${cat}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Rekap_Nilai_Mahasiswi_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Berhasil mengekspor rekap nilai ke CSV!");
+        }
+
+        // Bind elemen ke scope global agar HTML inline onclick tetap berjalan normal (ES Modules Scope Fix)
+        window.switchTab = switchTab;
+        window.setScore = setScore;
+        window.resetForm = resetForm;
+        window.saveStudent = saveStudent;
+        window.editStudent = editStudent;
+        window.deleteStudent = deleteStudent;
+        window.confirmClearAll = confirmClearAll;
+        window.closeDeleteModal = closeDeleteModal;
+        window.clearAllData = clearAllData;
+        window.exportToCSV = exportToCSV;
+        window.updateScores = updateScores;
+
+        // Listener input pencarian
+        document.getElementById('search-input').addEventListener('input', renderStudents);
+        document.getElementById('student-name').addEventListener('input', updateScores);
+
+        // Eksekusi boot awal
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeDatabase();
+            updateScores();
+        });
+    </script>
+</body>
+</html>
