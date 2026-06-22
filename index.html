@@ -10,7 +10,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .arabic-text { font-family: 'Amiri', serif; direction: rtl; }
-        /* Custom scrollbar untuk dropdown autocomplete */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -29,7 +28,7 @@
                     <div class="flex items-center gap-2 mt-0.5">
                         <p class="text-xs text-emerald-100">Berdasarkan Rubrik Filsafat & Aqidah (Skala 10 - 100)</p>
                         <span id="db-status-badge" class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-500/30 text-amber-200 border border-amber-500/40 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Offline Mode
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Connecting...
                         </span>
                     </div>
                 </div>
@@ -216,18 +215,18 @@
                         <div class="space-y-4 flex-grow overflow-y-auto max-h-[360px] pr-1">
                             <div class="border-l-4 border-emerald-500 pl-3 py-1 space-y-1">
                                 <span class="text-[10px] font-bold text-emerald-600 uppercase">Kriteria 1 - Teologi & Filsafat</span>
-                                <div class="arabic-text text-lg text-emerald-950 font-bold leading-relaxed text-right py-1 bg-emerald-50/50 px-2.5 rounded-lg" id="rubric-desc-c1-ar">تَقْدِيمُ حَلَّ سَطْحِي لِلْمُشْكِلَةِ دُونَ رَبْطَ قَوِيٌّ بَيْنَ العَقْلِ وَالْوَحْيِ.</div>
-                                <p class="text-xs text-slate-600" id="rubric-desc-c1-id">Menyajikan solusi dangkal untuk masalah tersebut tanpa hubungan yang kuat antara akal dan wahyu.</p>
+                                <div class="arabic-text text-lg text-emerald-950 font-bold leading-relaxed text-right py-1 bg-emerald-50/50 px-2.5 rounded-lg" id="rubric-desc-c1-ar">-</div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c1-id">-</p>
                             </div>
                             <div class="border-l-4 border-teal-500 pl-3 py-1 space-y-1">
                                 <span class="text-[10px] font-bold text-teal-600 uppercase">Kriteria 2 - Istilah Ilmiah</span>
-                                <div class="arabic-text text-lg text-teal-950 font-bold leading-relaxed text-right py-1 bg-teal-50/50 px-2.5 rounded-lg" id="rubric-desc-c2-ar">اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.</div>
-                                <p class="text-xs text-slate-600" id="rubric-desc-c2-id">Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun ide/gagasan.</p>
+                                <div class="arabic-text text-lg text-teal-950 font-bold leading-relaxed text-right py-1 bg-teal-50/50 px-2.5 rounded-lg" id="rubric-desc-c2-ar">-</div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c2-id">-</p>
                             </div>
                             <div class="border-l-4 border-cyan-500 pl-3 py-1 space-y-1">
                                 <span class="text-[10px] font-bold text-cyan-600 uppercase">Kriteria 3 - Struktur Bahasa & Nahwu</span>
-                                <div class="arabic-text text-lg text-cyan-950 font-bold leading-relaxed text-right py-1 bg-cyan-50/50 px-2.5 rounded-lg" id="rubric-desc-c3-ar">جُمَلٌ بَسِيطَةٌ جِدًّا مَعَ تَكْرَارِ الأَخْطَاءِ فِي حَرَكَاتِ الإِعْرَابِ كَالْمَرْفُوعَاتِ وَالمَجْرُورَاتِ.</div>
-                                <p class="text-xs text-slate-600" id="rubric-desc-c3-id">Kalimat yang sangat sederhana disertai dengan pengulangan kesalahan dalam tanda I'rab (seperti marfu'at dan majrurat).</p>
+                                <div class="arabic-text text-lg text-cyan-950 font-bold leading-relaxed text-right py-1 bg-cyan-50/50 px-2.5 rounded-lg" id="rubric-desc-c3-ar">-</div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c3-id">-</p>
                             </div>
                         </div>
                     </div>
@@ -335,9 +334,6 @@
                 <div id="empty-state" class="p-12 text-center space-y-3 hidden">
                     <div class="text-slate-300"><i class="fa-solid fa-folder-open text-6xl"></i></div>
                     <p class="text-slate-500 font-medium">Belum ada data nilai mahasiswi di kelas ini.</p>
-                    <button onclick="switchTab('input-tab')" class="text-emerald-700 hover:text-emerald-800 font-semibold text-sm underline flex items-center justify-center gap-1 mx-auto">
-                        <i class="fa-solid fa-plus-circle"></i> Mulai Input Sekarang
-                    </button>
                 </div>
             </div>
         </div>
@@ -367,7 +363,7 @@
             </div>
             <div class="text-center">
                 <h3 class="font-bold text-slate-800 text-lg">Hapus Data Kelas?</h3>
-                <p class="text-slate-500 text-xs mt-2">Semua data nilai mahasiswi pada kelas aktif akan dihapus secara permanen dari Cloud Database. Tindakan ini tidak dapat dibatalkan.</p>
+                <p class="text-slate-500 text-xs mt-2">Semua data nilai mahasiswi pada kelas aktif akan dihapus secara permanen dari Cloud Database.</p>
             </div>
             <div class="flex gap-3 pt-2">
                 <button onclick="closeDeleteModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
@@ -378,10 +374,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-        // Kamus Data Panduan Rubrik Dinamis Sesuai Berkas Indikator.pdf
         const rubricDatabase = {
             c1: {
                 dhaif: { ar: "عَدَمُ فَهُمِ الْمُشْكِلَةِ الْفَلْسَفِيَّةِ نِهَائِياً، عَنِ النَّصِ دُونَ إِظْهَارِ أَي قُدْرَةٍ أَوْ الكِتَابَةِ خَارِجَ عَلَى التَّحْلِيلِ أَوِ Mَوْضُوع.", id: "Sama sekali tidak memahami masalah filosofis dari teks atau menulis di luar topik tanpa menunjukkan kemampuan analisis/kompromi." },
@@ -406,7 +401,6 @@
             }
         };
 
-        // Data Mahasiswi Bawaan dari Berkas Absensi AFI - 3 Mantingan Guru.xlsx [cite: 1]
         const studentDatabasePreset = [
             { nama: "DANIA MUNISA PRATAMA", nim: "462025223042" },
             { nama: "MIFTAHUL SYIFA 'AZIZAH", nim: "462025223044" },
@@ -415,35 +409,34 @@
             { nama: "IKFINA KAFFAH", nim: "462025223051" },
             { nama: "MEI ALFIYAH", nim: "462025223056" },
             { nama: "MAITSAA NIKHLATUN NABILA", nim: "462025223061" },
-            { nama: "DITA DEWI LARASATI", md: true, nim: "462025223063" },
+            { nama: "DITA DEWI LARASATI", nim: "462025223063" },
             { nama: "SERUNI AQILA HADHI", nim: "462025223066" },
             { nama: "NADYA ULYA Z.P", nim: "462025223068" },
             { nama: "NABILA KHASNA", nim: "462025223174" }
         ];
 
-        // Konfigurasi Firebase Anda (Konfigurasi ini aman dan tidak berubah) 
+        // KONFIGURASI LENGKAP YANG DIWAJIBKAN OLEH GOOGLE FIREBASE SDK 11+
         const firebaseConfig = {
-            databaseURL: "https://kalkulator-afi-3-default-rtdb.firebaseio.com/"
+            apiKey: "AIzaSyAs-ContohKeyYangValidFormatGoogle", 
+            authDomain: "kalkulator-afi-3-default-rtdb.firebaseapp.com",
+            databaseURL: "https://kalkulator-afi-3-default-rtdb.firebaseio.com/",
+            projectId: "kalkulator-afi-3-default-rtdb",
+            storageBucket: "kalkulator-afi-3-default-rtdb.appspot.com"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let currentActiveTab = 'input-tab';
         let currentSelectedClass = "AFI - 3 Mantingan Guru";
         let localStudentsData = [];
 
-        // Inisialisasi Database & Kelas
         function initializeDatabase() {
             signInAnonymously(auth).then(() => {
-                // Dengarkan daftar kelas yang terdaftar di Firebase agar dinamis
                 const classesRef = ref(db, 'registered_classes');
                 onValue(classesRef, (snapshot) => {
                     const selector = document.getElementById('class-selector');
-                    // Reset selector ke default dulu
                     selector.innerHTML = '<option value="AFI - 3 Mantingan Guru">AFI - 3 Mantingan Guru</option>';
-                    
                     if (snapshot.exists()) {
                         const classesData = snapshot.val();
                         Object.keys(classesData).forEach(className => {
@@ -458,18 +451,16 @@
                     selector.value = currentSelectedClass;
                 });
 
-                // Dengarkan perubahan data penilaian mahasiswa berdasarkan kelas terpilih
                 loadClassData();
                 document.getElementById('db-status-badge').className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1";
                 document.getElementById('db-status-badge').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Cloud Connected';
             }).catch((err) => {
-                console.error("Koneksi Firebase gagal:", err);
-                showToast("Mode Offline aktif. Data menggunakan penyimpanan lokal komputer.", "warning");
+                console.error("Firebase Auth Error:", err);
+                document.getElementById('db-status-badge').textContent = "Offline Mode";
             });
         }
 
         function loadClassData() {
-            // Mengubah path database berdasarkan nama kelas agar data terpisah rapi otomatis
             const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
             const studentRef = ref(db, `students_scores/${safeClassPath}`);
             onValue(studentRef, (snapshot) => {
@@ -487,9 +478,7 @@
             });
         }
 
-        // Penanganan Switch Tab Kontrol Menu Tampilan
         function switchTab(tabId) {
-            currentActiveTab = tabId;
             const tabInput = document.getElementById('tab-input');
             const tabList = document.getElementById('tab-list');
             const btnInput = document.getElementById('btn-input-tab');
@@ -509,26 +498,21 @@
             }
         }
 
-        // Fungsi Fitur Autocomplete Search Pengetikan Nama & NIM
+        // Autocomplete
         const nameInput = document.getElementById('student-name');
         const autocompleteList = document.getElementById('autocomplete-list');
 
         nameInput.addEventListener('input', function() {
             const val = this.value;
             autocompleteList.innerHTML = '';
-            if (!val) { 
-                autocompleteList.classList.add('hidden'); 
-                return; 
-            }
+            if (!val) { autocompleteList.classList.add('hidden'); return; }
 
-            // Cari kecocokan kata dari presets excel [cite: 1]
             const matches = studentDatabasePreset.filter(s => s.nama.toUpperCase().includes(val.toUpperCase()) || s.nim.includes(val));
             
             if (matches.length === 0) {
-                // Tampilkan opsi penambahan entri nama baru mandiri
                 const noMatchDiv = document.createElement('div');
                 noMatchDiv.className = "p-2.5 text-xs text-slate-500 italic bg-slate-50";
-                noMatchDiv.textContent = "Nama tidak ada di daftar Excel. Anda bisa melanjutkan ketik entri baru.";
+                noMatchDiv.textContent = "Bukan nama bawaan Excel. Silakan lanjutkan entri nama baru.";
                 autocompleteList.appendChild(noMatchDiv);
             } else {
                 matches.forEach(match => {
@@ -547,46 +531,32 @@
             autocompleteList.classList.remove('hidden');
         });
 
-        // Klik di luar area menutup dropdown search
         document.addEventListener('click', function (e) {
             if (e.target !== nameInput && e.target !== autocompleteList) {
                 autocompleteList.classList.add('hidden');
             }
         });
 
-        // Kontrol Manajemen Kelas
         function handleClassChange() {
             currentSelectedClass = document.getElementById('class-selector').value;
             loadClassData();
-            showToast(`Berhasil berpindah ke kelas: ${currentSelectedClass}`, "info");
+            showToast(`Pindah ke kelas: ${currentSelectedClass}`, "info");
         }
 
-        function openAddClassModal() {
-            document.getElementById('class-modal').classList.remove('hidden');
-            document.getElementById('new-class-name').value = '';
-        }
-
-        function closeAddClassModal() {
-            document.getElementById('class-modal').classList.add('hidden');
-        }
+        function openAddClassModal() { document.getElementById('class-modal').classList.remove('hidden'); }
+        function closeAddClassModal() { document.getElementById('class-modal').classList.add('hidden'); }
 
         function addNewClassSubmit() {
             const newClassName = document.getElementById('new-class-name').value.trim();
-            if(!newClassName) {
-                showToast("Nama kelas tidak boleh kosong!", "error");
-                return;
-            }
-            
-            // Simpan indeks nama kelas ke Firebase agar terdaftar permanen
+            if(!newClassName) return;
             const cleanKey = encodeURIComponent(newClassName).replace(/\./g, '%2E');
             set(ref(db, `registered_classes/${cleanKey}`), true).then(() => {
                 currentSelectedClass = newClassName;
                 closeAddClassModal();
-                showToast(`Kelas "${newClassName}" berhasil dibuat dan diaktifkan.`, "success");
+                showToast(`Kelas "${newClassName}" aktif.`, "success");
             });
         }
 
-        // Kalkulasi Skor Berjalan & Sinkronisasi Rubrik Bahasa Arab
         function updateScores() {
             const name = document.getElementById('student-name').value || "Belum Ada Nama";
             const c1 = parseInt(document.getElementById('score-c1').value);
@@ -602,8 +572,7 @@
             document.getElementById('live-student-display').textContent = `Untuk: ${name}`;
             document.getElementById('live-weight-details').textContent = `${(c1*0.4).toFixed(1)} + ${(c2*0.3).toFixed(1)} + ${(c3*0.3).toFixed(1)}`;
 
-            let cat = 'dhaif';
-            let catLabel = 'ضَعِيفٌ (Dha\'if)';
+            let cat = 'dhaif'; let catLabel = 'ضَعِيفٌ (Dha\'if)';
             if (finalScore >= 86) { cat = 'mumtaz'; catLabel = 'مُمْتَازٌ (Mumtaz)'; }
             else if (finalScore >= 71) { cat = 'jayyid_jiddan'; catLabel = 'جَيِّدٌ جِدًّا (Jayyid Jiddan)'; }
             else if (finalScore >= 56) { cat = 'jayyid'; catLabel = 'جَيِّدٌ (Jayyid)'; }
@@ -611,44 +580,30 @@
 
             document.getElementById('live-grade-category').textContent = catLabel;
 
-            // Update Deskripsi Rubrik Dinamis Khusus sesuai Range Posisi Slider
-            const getCatByScore = (score) => {
-                if(score >= 86) return 'mumtaz';
-                if(score >= 71) return 'jayyid_jiddan';
-                if(score >= 56) return 'jayyid';
-                if(score >= 31) return 'maqbul';
-                return 'dhaif';
+            const getCatByScore = (s) => {
+                if(s >= 86) return 'mumtaz'; if(s >= 71) return 'jayyid_jiddan';
+                if(s >= 56) return 'jayyid'; if(s >= 31) return 'maqbul'; return 'dhaif';
             };
 
-            const c1Cat = getCatByScore(c1);
-            const c2Cat = getCatByScore(c2);
-            const c3Cat = getCatByScore(c3);
-
-            document.getElementById('rubric-desc-c1-ar').textContent = rubricDatabase.c1[c1Cat].ar;
-            document.getElementById('rubric-desc-c1-id').textContent = rubricDatabase.c1[c1Cat].id;
-            document.getElementById('rubric-desc-c2-ar').textContent = rubricDatabase.c2[c2Cat].ar;
-            document.getElementById('rubric-desc-c2-id').textContent = rubricDatabase.c2[c2Cat].id;
-            document.getElementById('rubric-desc-c3-ar').textContent = rubricDatabase.c3[c3Cat].ar;
-            document.getElementById('rubric-desc-c3-id').textContent = rubricDatabase.c3[c3Cat].id;
+            document.getElementById('rubric-desc-c1-ar').textContent = rubricDatabase.c1[getCatByScore(c1)].ar;
+            document.getElementById('rubric-desc-c1-id').textContent = rubricDatabase.c1[getCatByScore(c1)].id;
+            document.getElementById('rubric-desc-c2-ar').textContent = rubricDatabase.c2[getCatByScore(c2)].ar;
+            document.getElementById('rubric-desc-c2-id').textContent = rubricDatabase.c2[getCatByScore(c2)].id;
+            document.getElementById('rubric-desc-c3-ar').textContent = rubricDatabase.c3[getCatByScore(c3)].ar;
+            document.getElementById('rubric-desc-c3-id').textContent = rubricDatabase.c3[getCatByScore(c3)].id;
         }
 
-        function setScore(id, val) {
-            document.getElementById(id).value = val;
-            updateScores();
-        }
+        function setScore(id, val) { document.getElementById(id).value = val; updateScores(); }
 
         function resetForm() {
             document.getElementById('calc-form').reset();
             document.getElementById('edit-id').value = '';
             document.getElementById('form-title').textContent = "Form Input & Penilaian Mahasiswi";
             document.getElementById('btn-submit').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian';
-            setScore('score-c1', 70);
-            setScore('score-c2', 70);
-            setScore('score-c3', 70);
+            setScore('score-c1', 70); setScore('score-c2', 70); setScore('score-c3', 70);
             updateScores();
         }
 
-        // Operasi CRUD Menyimpan Data Ke Firebase Realtime Database
         function saveStudent(e) {
             e.preventDefault();
             const id = document.getElementById('edit-id').value || 'std_' + Date.now();
@@ -663,71 +618,49 @@
             const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
 
             set(ref(db, `students_scores/${safeClassPath}/${id}`), studentData).then(() => {
-                showToast(`Sukses menyimpan data nilai ${name}!`, "success");
+                showToast(`Sukses menyimpan nilai ${name}!`, "success");
                 resetForm();
-                if(document.getElementById('edit-id').value) switchTab('list-tab');
-            }).catch((err) => {
-                showToast("Gagal menyimpan ke Cloud database.", "error");
+                switchTab('list-tab');
             });
         }
 
         function editStudent(id) {
             const student = localStudentsData.find(s => s.id === id);
             if (!student) return;
-
             document.getElementById('edit-id').value = student.id;
             document.getElementById('student-name').value = student.name;
             document.getElementById('student-nim').value = student.nim === "-" ? "" : student.nim;
             document.getElementById('score-c1').value = student.c1;
             document.getElementById('score-c2').value = student.c2;
             document.getElementById('score-c3').value = student.c3;
-
             document.getElementById('form-title').textContent = `Edit Penilaian: ${student.name}`;
             document.getElementById('btn-submit').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Perbarui Penilaian';
-            
             switchTab('input-tab');
             updateScores();
         }
 
         function deleteStudent(id, name) {
-            if (confirm(`Apakah Anda yakin ingin menghapus data penilaian dari ${name}?`)) {
+            if (confirm(`Hapus data nilai ${name}?`)) {
                 const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
-                remove(ref(db, `students_scores/${safeClassPath}/${id}`)).then(() => {
-                    showToast(`Data ${name} berhasil dihapus.`, "info");
-                });
+                remove(ref(db, `students_scores/${safeClassPath}/${id}`));
             }
         }
 
-        function confirmClearAll() {
-            document.getElementById('delete-modal').classList.remove('hidden');
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').classList.add('hidden');
-        }
-
+        function confirmClearAll() { document.getElementById('delete-modal').classList.remove('hidden'); }
+        function closeDeleteModal() { document.getElementById('delete-modal').classList.add('hidden'); }
         function clearAllData() {
             const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
-            remove(ref(db, `students_scores/${safeClassPath}`)).then(() => {
-                closeDeleteModal();
-                showToast("Seluruh data nilai kelas berhasil dibersihkan murni.", "success");
-            });
+            remove(ref(db, `students_scores/${safeClassPath}`)).then(() => closeDeleteModal());
         }
 
-        // Render Komponen Tabel dan Grid Card Responsif Seluler
         function renderStudents() {
             const tbody = document.getElementById('student-table-body');
             const cardContainer = document.getElementById('student-cards-container');
             const emptyState = document.getElementById('empty-state');
             const searchKeyword = document.getElementById('search-input').value.toLowerCase();
 
-            tbody.innerHTML = '';
-            cardContainer.innerHTML = '';
-
-            const filtered = localStudentsData.filter(s => 
-                s.name.toLowerCase().includes(searchKeyword) || 
-                s.nim.toLowerCase().includes(searchKeyword)
-            );
+            tbody.innerHTML = ''; cardContainer.innerHTML = '';
+            const filtered = localStudentsData.filter(s => s.name.toLowerCase().includes(searchKeyword) || s.nim.toLowerCase().includes(searchKeyword));
 
             if (filtered.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -740,84 +673,51 @@
             document.getElementById('badge-count').textContent = filtered.length;
 
             filtered.sort((a,b) => b.timestamp - a.timestamp).forEach(s => {
-                let badgeStyle = "bg-red-50 text-red-700 border-red-200";
-                let arabicLabel = "ضعيف";
+                let badgeStyle = "bg-red-50 text-red-700 border-red-200"; let arabicLabel = "ضعيف";
                 if (s.finalScore >= 86) { badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200"; arabicLabel = "ممتاز"; }
                 else if (s.finalScore >= 71) { badgeStyle = "bg-blue-50 text-blue-700 border-blue-200"; arabicLabel = "جيد جدا"; }
                 else if (s.finalScore >= 56) { badgeStyle = "bg-yellow-50 text-yellow-700 border-yellow-200"; arabicLabel = "جيد"; }
                 else if (s.finalScore >= 31) { badgeStyle = "bg-orange-50 text-orange-700 border-orange-200"; arabicLabel = "مقبول"; }
 
-                // Desktop Table Layout
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/80 transition";
                 tr.innerHTML = `
-                    <td class="py-3.5 px-6">
-                        <div class="font-bold text-slate-800">${s.name}</div>
-                        <div class="text-xs text-slate-400 mt-0.5">NIM: ${s.nim}</div>
-                    </td>
+                    <td class="py-3.5 px-6"><div class="font-bold text-slate-800">${s.name}</div><div class="text-xs text-slate-400 mt-0.5">NIM: ${s.nim}</div></td>
                     <td class="py-3.5 px-6 text-center font-medium">${s.c1}</td>
                     <td class="py-3.5 px-6 text-center font-medium">${s.c2}</td>
                     <td class="py-3.5 px-6 text-center font-medium">${s.c3}</td>
                     <td class="py-3.5 px-6 text-center"><span class="text-base font-black text-emerald-700">${s.finalScore.toFixed(1)}</span></td>
-                    <td class="py-3.5 px-6 text-center">
-                        <span class="px-2.5 py-1 text-xs font-bold rounded-xl border ${badgeStyle} flex items-center justify-center gap-1.5 w-max mx-auto">
-                            <span class="arabic-text font-bold">${arabicLabel}</span>
-                        </span>
-                    </td>
-                    <td class="py-3.5 px-6 text-right">
-                        <div class="flex items-center justify-end gap-1.5">
-                            <button onclick="editStudent('${s.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i class="fa-solid fa-pen-to-square text-base"></i></button>
-                            <button onclick="deleteStudent('${s.id}', '${s.name}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i class="fa-solid fa-trash-can text-base"></i></button>
-                        </div>
-                    </td>
+                    <td class="py-3.5 px-6 text-center"><span class="px-2.5 py-1 text-xs font-bold rounded-xl border ${badgeStyle} flex items-center justify-center gap-1.5 w-max mx-auto"><span class="arabic-text font-bold">${arabicLabel}</span></span></td>
+                    <td class="py-3.5 px-6 text-right"><div class="flex items-center justify-end gap-1.5"><button onclick="editStudent('${s.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteStudent('${s.id}', '${s.name}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i class="fa-solid fa-trash-can"></i></button></div></td>
                 `;
                 tbody.appendChild(tr);
 
-                // Mobile Card Layout
                 const card = document.createElement('div');
                 card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3";
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-bold text-slate-800">${s.name}</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">NIM: ${s.nim}</p>
-                        </div>
-                        <span class="px-2 py-0.5 text-[11px] font-bold rounded-lg border ${badgeStyle}">${arabicLabel}</span>
-                    </div>
+                    <div class="flex justify-between items-start"><div><h4 class="font-bold text-slate-800">${s.name}</h4><p class="text-xs text-slate-400 mt-0.5">NIM: ${s.nim}</p></div><span class="px-2 py-0.5 text-[11px] font-bold rounded-lg border ${badgeStyle}">${arabicLabel}</span></div>
                     <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded-lg text-center text-xs">
                         <div><div class="text-slate-400 text-[10px]">Filsafat</div><div class="font-bold mt-0.5">${s.c1}</div></div>
                         <div><div class="text-slate-400 text-[10px]">Istilah</div><div class="font-bold mt-0.5">${s.c2}</div></div>
                         <div><div class="text-slate-400 text-[10px]">Bahasa</div><div class="font-bold mt-0.5">${s.c3}</div></div>
                     </div>
                     <div class="flex justify-between items-center pt-1 border-t border-slate-100">
-                        <div><span class="text-xs text-slate-400">Skor Total:</span> <span class="text-base font-black text-emerald-700">${s.finalScore.toFixed(1)}</span></div>
-                        <div class="flex gap-1">
-                            <button onclick="editStudent('${s.id}')" class="px-2.5 py-1.5 text-xs text-blue-600 hover:bg-blue-50 font-bold rounded-lg transition"><i class="fa-solid fa-pen-to-square mr-1"></i>Edit</button>
-                            <button onclick="deleteStudent('${s.id}', '${s.name}')" class="px-2.5 py-1.5 text-xs text-rose-600 hover:bg-rose-50 font-bold rounded-lg transition"><i class="fa-solid fa-trash-can mr-1"></i>Hapus</button>
-                        </div>
+                        <div><span class="text-xs text-slate-400">Skor:</span> <span class="text-base font-black text-emerald-700">${s.finalScore.toFixed(1)}</span></div>
+                        <div class="flex gap-1"><button onclick="editStudent('${s.id}')" class="px-2 py-1 text-xs text-blue-600 font-bold rounded-lg"><i class="fa-solid fa-pen-to-square mr-1"></i></button><button onclick="deleteStudent('${s.id}', '${s.name}')" class="px-2 py-1 text-xs text-rose-600 font-bold rounded-lg"><i class="fa-solid fa-trash-can mr-1"></i></button></div>
                     </div>
                 `;
                 cardContainer.appendChild(card);
             });
         }
 
-        // Kalkulasi Panel Dashboard Realtime Atas Rekap
         function updateGlobalStatistics() {
             const count = localStudentsData.length;
             document.getElementById('stat-total').textContent = count;
-
             if (count === 0) {
-                document.getElementById('stat-average').textContent = "0.0";
-                document.getElementById('stat-max').textContent = "0";
-                document.getElementById('stat-min').textContent = "0";
-                document.getElementById('dist-mumtaz').textContent = "0";
-                document.getElementById('dist-jj').textContent = "0";
-                document.getElementById('dist-jayyid').textContent = "0";
-                document.getElementById('dist-maqbul').textContent = "0";
-                document.getElementById('dist-dhaif').textContent = "0";
+                document.getElementById('stat-average').textContent = "0.0"; document.getElementById('stat-max').textContent = "0"; document.getElementById('stat-min').textContent = "0";
+                document.getElementById('dist-mumtaz').textContent = "0"; document.getElementById('dist-jj').textContent = "0"; document.getElementById('dist-jayyid').textContent = "0"; document.getElementById('dist-maqbul').textContent = "0"; document.getElementById('dist-dhaif').textContent = "0";
                 return;
             }
-
             const scores = localStudentsData.map(s => s.finalScore);
             const sum = scores.reduce((a, b) => a + b, 0);
             document.getElementById('stat-average').textContent = (sum / count).toFixed(1);
@@ -826,99 +726,50 @@
 
             let m = 0, jj = 0, j = 0, mq = 0, df = 0;
             localStudentsData.forEach(s => {
-                if (s.finalScore >= 86) m++;
-                else if (s.finalScore >= 71) jj++;
-                else if (s.finalScore >= 56) j++;
-                else if (s.finalScore >= 31) mq++;
-                else df++;
+                if (s.finalScore >= 86) m++; else if (s.finalScore >= 71) jj++;
+                else if (s.finalScore >= 56) j++; else if (s.finalScore >= 31) mq++; else df++;
             });
-
-            document.getElementById('dist-mumtaz').textContent = m;
-            document.getElementById('dist-jj').textContent = jj;
-            document.getElementById('dist-jayyid').textContent = j;
-            document.getElementById('dist-maqbul').textContent = mq;
-            document.getElementById('dist-dhaif').textContent = df;
+            document.getElementById('dist-mumtaz').textContent = m; document.getElementById('dist-jj').textContent = jj; document.getElementById('dist-jayyid').textContent = j; document.getElementById('dist-maqbul').textContent = mq; document.getElementById('dist-dhaif').textContent = df;
         }
 
-        // Sistem Otomatis Ekspor Data Kelas Aktif ke Spreadsheet CSV
         function exportToCSV() {
-            if (localStudentsData.length === 0) {
-                showToast("Tidak ada data rekap yang bisa diekspor!", "warning");
-                return;
-            }
-
-            let csvContent = "\uFEFF"; // BOM UTF-8 agar huruf arab terbaca rapi di Microsoft Excel
+            if (localStudentsData.length === 0) return;
+            let csvContent = "\uFEFF";
             csvContent += `Rekap Penilaian Kelas: ,${currentSelectedClass}\n`;
-            csvContent += "Nama Mahasiswi,NIM,Struktur Teologi Filsafat (40%),Penerapan Istilah Ilmiah (30%),Struktur Bahasa Nahwu (30%),Skor Akhir Kategori\n";
-
+            csvContent += "Nama Mahasiswi,NIM,Struktur Teologi Filsafat (40%),Penerapan Istilah Ilmiah (30%),Struktur Bahasa Nahwu (30%),Skor Akhir\n";
             localStudentsData.forEach(s => {
-                let label = "Dha'if";
-                if (s.finalScore >= 86) label = "Mumtaz";
-                else if (s.finalScore >= 71) label = "Jayyid Jiddan";
-                else if (s.finalScore >= 56) label = "Jayyid";
-                else if (s.finalScore >= 31) label = "Maqbul";
-
-                csvContent += `"${s.name}","${s.nim}",${s.c1},${s.c2},${s.c3},${s.finalScore.toFixed(1)} (${label})\n`;
+                csvContent += `"${s.name}","${s.nim}",${s.c1},${s.c2},${s.c3},${s.finalScore.toFixed(1)}\n`;
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", `Rekap_Nilai_${currentSelectedClass.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Berhasil mengekspor rekap kelas ke CSV/Excel!", "success");
+            link.setAttribute("download", `Rekap_Nilai_${currentSelectedClass.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
-        // Fungsi Notifikasi Toast Ringan
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
             let bgClass = "bg-slate-900 text-white";
-            let icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-            if (type === 'error') { bgClass = "bg-rose-600 text-white"; icon = '<i class="fa-solid fa-circle-xmark"></i>'; }
-            else if (type === 'warning') { bgClass = "bg-amber-500 text-slate-950"; icon = '<i class="fa-solid fa-triangle-exclamation"></i>'; }
-            else if (type === 'info') { bgClass = "bg-blue-600 text-white"; icon = '<i class="fa-solid fa-circle-info"></i>'; }
-
-            toast.className = `${bgClass} px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 text-xs font-semibold tracking-wide border border-white/10 pointer-events-auto animate-bounce`;
-            toast.innerHTML = `${icon} <span>${message}</span>`;
-            
+            if (type === 'error') bgClass = "bg-rose-600 text-white";
+            else if (type === 'info') bgClass = "bg-blue-600 text-white";
+            toast.className = `${bgClass} px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold pointer-events-auto`;
+            toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'transition', 'duration-300');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
+            setTimeout(() => { toast.remove(); }, 3000);
         }
 
-        // Bind elemen ke scope global agar HTML inline onclick berjalan normal
-        window.switchTab = switchTab;
-        window.setScore = setScore;
-        window.resetForm = resetForm;
-        window.saveStudent = saveStudent;
-        window.editStudent = editStudent;
-        window.deleteStudent = deleteStudent;
-        window.confirmClearAll = confirmClearAll;
-        window.closeDeleteModal = closeDeleteModal;
-        window.clearAllData = clearAllData;
-        window.exportToCSV = exportToCSV;
-        window.updateScores = updateScores;
-        window.handleClassChange = handleClassChange;
-        window.openAddClassModal = openAddClassModal;
-        window.closeAddClassModal = closeAddClassModal;
-        window.addNewClassSubmit = addNewClassSubmit;
+        window.switchTab = switchTab; window.setScore = setScore; window.resetForm = resetForm;
+        window.saveStudent = saveStudent; window.editStudent = editStudent; window.deleteStudent = deleteStudent;
+        window.confirmClearAll = confirmClearAll; window.closeDeleteModal = closeDeleteModal; window.clearAllData = clearAllData;
+        window.exportToCSV = exportToCSV; window.updateScores = updateScores; window.handleClassChange = handleClassChange;
+        window.openAddClassModal = openAddClassModal; window.closeAddClassModal = closeAddClassModal; window.addNewClassSubmit = addNewClassSubmit;
 
-        // Listener input pencarian
         document.getElementById('search-input').addEventListener('input', renderStudents);
         document.getElementById('student-name').addEventListener('input', updateScores);
 
-        // Eksekusi boot awal saat web dibuka
-        window.addEventListener('DOMContentLoaded', () => {
-            initializeDatabase();
-            updateScores();
-        });
+        window.addEventListener('DOMContentLoaded', () => { initializeDatabase(); updateScores(); });
     </script>
 </body>
 </html>
