@@ -175,7 +175,7 @@
                         </div>
 
                         <div class="flex gap-3 pt-2">
-                            <button type="submit" id="btn-submit" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2">
+                            <button type="submit" id="btn-submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian
                             </button>
                         </div>
@@ -212,7 +212,7 @@
                             <i class="fa-solid fa-book-open text-teal-600 text-lg"></i>
                             <h3 class="font-bold text-slate-800 text-sm">Deskripsi Indikator Berjalan</h3>
                         </div>
-                        <div class="space-y-4 flex-grow overflow-y-auto max-h-[360px] pr-1">
+                        <div class="space-y-4 flex-grow overflow-y-auto max-h-[360px] pr-1 custom-scroll">
                             <div class="border-l-4 border-emerald-500 pl-3 py-1 space-y-1">
                                 <span class="text-[10px] font-bold text-emerald-600 uppercase">Kriteria 1 - Teologi & Filsafat</span>
                                 <div class="arabic-text text-lg text-emerald-950 font-bold leading-relaxed text-right py-1 bg-emerald-50/50 px-2.5 rounded-lg" id="rubric-desc-c1-ar">-</div>
@@ -270,7 +270,7 @@
                 <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-emerald-600"></i> Sebaran Kategori Nilai Mahasiswi
                 </h3>
-                <div class="grid grid-cols-5 gap-2" id="distribution-container">
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="distribution-container">
                     <div class="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-center">
                         <div class="text-[10px] font-bold text-emerald-800">Mumtaz (86-100)</div>
                         <div class="text-lg font-black text-emerald-700 mt-1" id="dist-mumtaz">0</div>
@@ -287,7 +287,7 @@
                         <div class="text-[10px] font-bold text-orange-800">Maqbul (31-55)</div>
                         <div class="text-lg font-black text-orange-700 mt-1" id="dist-maqbul">0</div>
                     </div>
-                    <div class="bg-red-50 border border-red-100 p-2 rounded-xl text-center">
+                    <div class="bg-red-50 border border-red-100 p-2 rounded-xl text-center col-span-2 sm:col-span-1">
                         <div class="text-[10px] font-bold text-red-800">Dha'if (10-30)</div>
                         <div class="text-lg font-black text-red-700 mt-1" id="dist-dhaif">0</div>
                     </div>
@@ -387,7 +387,7 @@
             },
             c2: {
                 dhaif: { ar: "خُلُو الوَرَقَةِ تَمَAMاً مِنَ الْمُصْطَلَحَاتِ الْعِلْمِيَّةِ المَطْلُوبَةِ.", id: "Lembar jawaban sama sekali tidak memuat istilah-istilah ilmiah yang diwajibkan." },
-                maqbul: { ar: "ذِكْرُ الْمُصْطَلَحَاتِ كَكَلِمَاتٍ مُفْرَدَةِ دُونَ إِدْخَالِهَا فِي جُمَلٍ مُفِيدَةٍ.", id: "Hanya menyebutkan istilah-istilah sebagai kata tunggal terpisah tanpa memasukkannya ke dalam kalimat yang bermakna." },
+                maqbul: { ar: "ذِكْرُ الْمُصْطَلَحَاتِ كَكَلِمَاتٍ مُفْرَدِ دُونَ إِدْخَالِهَا فِي جُمَلٍ مُفِيدَةٍ.", id: "Hanya menyebutkan istilah-istilah sebagai kata tunggal terpisah tanpa memasukkannya ke dalam kalimat yang bermakna." },
                 jayyid: { ar: "اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.", id: "Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun ide/gagasan." },
                 jayyid_jiddan: { ar: "اسْتِخْدَامُ مُصْطَلَحَيْنِ فِي تَأْوِيلِ النَّصِ، أَسَسُ النَّقْلِ فِي سِيَاقِهَا الصحيح دائماً.", id: "Menggunakan dua istilah dalam interpretasi teks, memposisikan fondasi naql dalam konteksnya yang selalu tepat." },
                 mumtaz: { ar: "اسْتِخْدَامُ جَمِيعِ الْمُصْطَلَحَاتِ (قَانُوناً كلياً ، كِتَابَةٌ لُغَوِيَّةٌ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ).", id: "Menggunakan seluruh istilah ilmiah yang diminta secara komprehensif, dengan penulisan bahasa yang benar serta ekspresi yang sangat akurat." }
@@ -415,7 +415,9 @@
             { nama: "NABILA KHASNA", nim: "462025223174" }
         ];
 
-        // KONFIGURASI LENGKAP YANG DIWAJIBKAN OLEH GOOGLE FIREBASE SDK 11+
+        // =========================================================================
+        // PENTING: GANTI DENGAN VALUE ASLI DARI FIREBASE CONSOLE ANDA AGAR ONLINE RE-CONNECTED!
+        // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAs-ContohKeyYangValidFormatGoogle", 
             authDomain: "kalkulator-afi-3-default-rtdb.firebaseapp.com",
@@ -433,6 +435,7 @@
 
         function initializeDatabase() {
             signInAnonymously(auth).then(() => {
+                // Sinkronisasi daftar kelas dinamis
                 const classesRef = ref(db, 'registered_classes');
                 onValue(classesRef, (snapshot) => {
                     const selector = document.getElementById('class-selector');
@@ -455,8 +458,9 @@
                 document.getElementById('db-status-badge').className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1";
                 document.getElementById('db-status-badge').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Cloud Connected';
             }).catch((err) => {
-                console.error("Firebase Auth Error:", err);
-                document.getElementById('db-status-badge').textContent = "Offline Mode";
+                console.error("Firebase Connection Error:", err);
+                document.getElementById('db-status-badge').className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1";
+                document.getElementById('db-status-badge').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Offline Mode';
             });
         }
 
@@ -552,8 +556,9 @@
             const cleanKey = encodeURIComponent(newClassName).replace(/\./g, '%2E');
             set(ref(db, `registered_classes/${cleanKey}`), true).then(() => {
                 currentSelectedClass = newClassName;
+                document.getElementById('new-class-name').value = "";
                 closeAddClassModal();
-                showToast(`Kelas "${newClassName}" aktif.`, "success");
+                showToast(`Kelas "${newClassName}" berhasil dibuat!`, "success");
             });
         }
 
@@ -621,7 +626,7 @@
                 showToast(`Sukses menyimpan nilai ${name}!`, "success");
                 resetForm();
                 switchTab('list-tab');
-            });
+            }).catch(e => showToast("Gagal menyimpan! Periksa koneksi Firebase.", "error"));
         }
 
         function editStudent(id) {
@@ -733,8 +738,11 @@
         }
 
         function exportToCSV() {
-            if (localStudentsData.length === 0) return;
-            let csvContent = "\uFEFF";
+            if (localStudentsData.length === 0) {
+                showToast("Tidak ada data untuk diekspor!", "error");
+                return;
+            }
+            let csvContent = "\uFEFF"; // BOM agar karakter khusus Excel aman
             csvContent += `Rekap Penilaian Kelas: ,${currentSelectedClass}\n`;
             csvContent += "Nama Mahasiswi,NIM,Struktur Teologi Filsafat (40%),Penerapan Istilah Ilmiah (30%),Struktur Bahasa Nahwu (30%),Skor Akhir\n";
             localStudentsData.forEach(s => {
@@ -746,6 +754,7 @@
             link.setAttribute("href", url);
             link.setAttribute("download", `Rekap_Nilai_${currentSelectedClass.replace(/\s+/g, '_')}.csv`);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast("Berhasil mengunduh file Excel/CSV!", "success");
         }
 
         function showToast(message, type = 'success') {
@@ -760,6 +769,7 @@
             setTimeout(() => { toast.remove(); }, 3000);
         }
 
+        // Global Window Expose Fix
         window.switchTab = switchTab; window.setScore = setScore; window.resetForm = resetForm;
         window.saveStudent = saveStudent; window.editStudent = editStudent; window.deleteStudent = deleteStudent;
         window.confirmClearAll = confirmClearAll; window.closeDeleteModal = closeDeleteModal; window.clearAllData = clearAllData;
