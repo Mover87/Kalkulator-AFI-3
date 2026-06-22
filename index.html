@@ -47,21 +47,27 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 flex-grow w-full">
         <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-lg font-bold">
+            <div class="flex items-center gap-3 flex-grow">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0">
                     <i class="fa-solid fa-school"></i>
                 </div>
-                <div>
+                <div class="flex-grow">
                     <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Kelas Aktif Saat Ini</span>
                     <div class="flex items-center gap-2">
-                        <select id="class-selector" onchange="handleClassChange()" class="text-base font-bold text-slate-800 bg-transparent border-none p-0 pr-6 focus:ring-0 cursor-pointer outline-none">
+                        <select id="class-selector" onchange="handleClassChange()" class="text-base font-bold text-slate-800 bg-transparent border-none p-0 pr-6 focus:ring-0 cursor-pointer outline-none max-w-xs sm:max-w-md">
                             <option value="AFI - 3 Mantingan Guru">AFI - 3 Mantingan Guru</option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="openAddClassModal()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold py-2 px-3.5 rounded-xl border border-emerald-200/60 transition flex items-center gap-1.5">
+            <div class="flex flex-wrap gap-2">
+                <button onclick="openEditClassModal()" id="btn-edit-class" class="bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold py-2 px-3.5 rounded-xl border border-slate-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-pen-to-square text-amber-600"></i> Ubah Nama Kelas
+                </button>
+                <button onclick="confirmDeleteClass()" id="btn-delete-class" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold py-2 px-3.5 rounded-xl border border-rose-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-folder-minus"></i> Hapus Kelas Ini
+                </button>
+                <button onclick="openAddClassModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-xl shadow-sm transition flex items-center gap-1.5">
                     <i class="fa-solid fa-folder-plus"></i> Tambah Kelas Baru
                 </button>
             </div>
@@ -307,7 +313,7 @@
                             <i class="fa-solid fa-file-excel"></i> Ekspor CSV/Excel
                         </button>
                         <button onclick="confirmClearAll()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold py-2 px-4 rounded-xl text-xs sm:text-sm border border-rose-200 transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-trash-can"></i> Hapus Semua Data Kelas Ini
+                            <i class="fa-solid fa-trash-can"></i> Hapus Semua Data Nilai Kelas Ini
                         </button>
                     </div>
                 </div>
@@ -356,18 +362,56 @@
         </div>
     </div>
 
+    <div id="edit-class-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
+            <div class="flex items-center gap-2 text-amber-700 bg-amber-50 w-full p-3 rounded-xl">
+                <i class="fa-solid fa-pen-to-square text-xl"></i>
+                <h3 class="font-bold text-slate-800 text-base">Ubah Nama Kelas</h3>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nama Kelas Sekarang</label>
+                <input type="text" id="edit-class-old-name" disabled class="w-full rounded-xl border border-slate-100 bg-slate-50 p-2.5 text-sm text-slate-400 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nama Kelas Baru</label>
+                <input type="text" id="edit-class-new-name" placeholder="Masukkan nama perbaikan..." class="w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+            </div>
+            <p class="text-[10px] text-amber-600 leading-relaxed"><i class="fa-solid fa-circle-info"></i> Mengubah nama kelas akan memindahkan seluruh data nilai mahasiswi di dalamnya ke nama kelas yang baru.</p>
+            <div class="flex gap-3 pt-1">
+                <button onclick="closeEditClassModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
+                <button onclick="submitEditClassName()" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm rounded-xl shadow transition">Perbarui Nama</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-class-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
+            <div class="text-rose-600 bg-rose-50 w-12 h-12 rounded-full flex items-center justify-center text-2xl mx-auto">
+                <i class="fa-solid fa-folder-minus"></i>
+            </div>
+            <div class="text-center">
+                <h3 class="font-bold text-slate-800 text-lg">Hapus Kelas Secara Total?</h3>
+                <p class="text-slate-500 text-xs mt-2">Kelas <span id="delete-class-target-name" class="font-bold text-slate-800"></span> beserta **seluruh nilai mahasiswi di dalamnya** akan dihapus permanen dari sistem cloud.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeDeleteClassModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
+                <button onclick="submitDeleteClass()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm rounded-xl shadow transition">Ya, Hapus Total</button>
+            </div>
+        </div>
+    </div>
+
     <div id="delete-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
             <div class="text-rose-600 bg-rose-50 w-12 h-12 rounded-full flex items-center justify-center text-2xl mx-auto">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div class="text-center">
-                <h3 class="font-bold text-slate-800 text-lg">Hapus Data Kelas?</h3>
-                <p class="text-slate-500 text-xs mt-2">Semua data nilai mahasiswi pada kelas aktif akan dihapus secara permanen dari Cloud Database.</p>
+                <h3 class="font-bold text-slate-800 text-lg">Kosongkan Nilai Kelas?</h3>
+                <p class="text-slate-500 text-xs mt-2">Semua data nilai mahasiswi pada kelas aktif akan dikosongkan. Struktur nama wadah kelas tidak akan hilang.</p>
             </div>
             <div class="flex gap-3 pt-2">
                 <button onclick="closeDeleteModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
-                <button onclick="clearAllData()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm rounded-xl shadow transition">Ya, Hapus</button>
+                <button onclick="clearAllData()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm rounded-xl shadow transition">Ya, Kosongkan</button>
             </div>
         </div>
     </div>
@@ -375,7 +419,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, remove, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const rubricDatabase = {
             c1: {
@@ -383,14 +427,14 @@
                 maqbul: { ar: "نَقْلُ العِبَارَاتِ التَّوْفِيقِ.", id: "Hanya memindahkan/menyalin ungkapan atau kutipan teks rekonsiliasi apa adanya tanpa analisis mandiri." },
                 jayyid: { ar: "تَقْدِيمُ حَلَّ سَطْحِي لِلْمُشْكِلَةِ دُونَ رَبْطَ قَوِيٌّ بَيْنَ العَقْلِ وَالْوَحْيِ.", id: "Menyajikan solusi dangkal untuk masalah tersebut tanpa hubungan yang kuat antara akal dan wahyu." },
                 jayyid_jiddan: { ar: "فَهُمْ صَحِيحٌ لِلْمُشْكِلَةِ مَعَ صِيَاغَةِ حَلَّ مَنْطِقِي دُونَ عَمِيقٍ مَقْبُولٍ تَفْصِيلٍ.", id: "Pemahaman yang benar terhadap masalah disertai rumusan solusi logis yang dapat diterima, namun tanpa rincian logis yang mendalam." },
-                mumtaz: { ar: "قُدْرَةٌ عَالِيَةٌ عَلَى حَلَّ التَّعَارُضِ عَقْلِياً، وَالالْتِزَامِ بِفِكْرَةِ أَنَّ العَقْلَ أَسَسُ النَّقْلِ بِعُمْقٍ.", id: "Kemampuan sangat tinggi dalam memecahkan kontradiksi secara rasional, serta berkomitmen secara mendalam pada gagasan bahwa akal adalah landasan bagi naql (teks wahyu)." }
+                mumtaz: { ar: "قُدْرَةٌ عَالِيَةٌ عَلَى حَلَّ التَّعَارُضِ عَقْلِياً، وَالالْتِزَAMِ بِفِكْرَةِ أَنَّ العَقْلَ أَسَسُ النَّقْلِ بِعُمْقٍ.", id: "Kemampuan sangat tinggi dalam memecahkan kontradiksi secara rasional, serta berkomitmen secara mendalam pada gagasan bahwa akal adalah landasan bagi naql (teks wahyu)." }
             },
             c2: {
                 dhaif: { ar: "خُلُو الوَرَقَةِ تَمَAMاً مِنَ الْمُصْطَلَحَاتِ الْعِلْمِيَّةِ المَطْلُوبَةِ.", id: "Lembar jawaban sama sekali tidak memuat istilah-istilah ilmiah yang diwajibkan." },
                 maqbul: { ar: "ذِكْرُ الْمُصْطَلَحَاتِ كَكَلِمَاتٍ مُفْرَدِ دُونَ إِدْخَالِهَا فِي جُمَلٍ مُفِيدَةٍ.", id: "Hanya menyebutkan istilah-istilah sebagai kata tunggal terpisah tanpa memasukkannya ke dalam kalimat yang bermakna." },
-                jayyid: { ar: "اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.", id: "Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun ide/gagasan." },
-                jayyid_jiddan: { ar: "اسْتِخْدَامُ مُصْطَلَحَيْنِ فِي تَأْوِيلِ النَّصِ، أَسَسُ النَّقْلِ فِي سِيَاقِهَا الصحيح دائماً.", id: "Menggunakan dua istilah dalam interpretasi teks, memposisikan fondasi naql dalam konteksnya yang selalu tepat." },
-                mumtaz: { ar: "اسْتِخْدَامُ جَمِيعِ الْمُصْطَلَحَاتِ (قَانُوناً كلياً ، كِتَابَةٌ لُغَوِيَّةٌ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ).", id: "Menggunakan seluruh istilah ilmiah yang diminta secara komprehensif, dengan penulisan bahasa yang benar serta ekspresi yang sangat akurat." }
+                jayyid: { ar: "اسْتِخْدَAMُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.", id: "Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun ide/gagasan." },
+                jayyid_jiddan: { ar: "اسْتِخْدAMُ مُصْطَلَحَيْنِ فِي تَأْوِيلِ النَّصِ، أَسَسُ النَّقْلِ فِي سِيَاقِهَا الصحيح دائماً.", id: "Menggunakan dua istilah dalam interpretasi teks, memposisikan fondasi naql dalam konteksnya yang selalu tepat." },
+                mumtaz: { ar: "اسْتِخْدAMُ جَمِيعِ الْمُصْطَلَحَاتِ (قَانُوناً كلياً ، كِتَابَةٌ لُغَوِيَّةٌ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ).", id: "Menggunakan seluruh istilah ilmiah yang diminta secara komprehensif, dengan penulisan bahasa yang benar serta ekspresi yang sangat akurat." }
             },
             c3: {
                 dhaif: { ar: "رَكَاكَةٌ شَدِيدَةٌ فِي صِيَاغَةُ جُمَلٍ مُرَكَّبَةٍ كِتَابَةٌ لُغَوِيَّةٌ.", id: "Kelemahan/kerancuan yang sangat parah dalam menyusun kalimat majemuk secara struktur kebahasaan." },
@@ -430,8 +474,6 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        // PERBAIKAN FATAL: Memaksa inisialisasi getDatabase menggunakan alamat URL eksplisit dari config
         const db = getDatabase(app, firebaseConfig.databaseURL);
 
         let currentSelectedClass = "AFI - 3 Mantingan Guru";
@@ -455,6 +497,7 @@
                         });
                     }
                     selector.value = currentSelectedClass;
+                    toggleControlButtons();
                 });
 
                 loadClassData();
@@ -465,6 +508,19 @@
                 document.getElementById('db-status-badge').className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1";
                 document.getElementById('db-status-badge').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Offline Mode';
             });
+        }
+
+        function toggleControlButtons() {
+            // Sembunyikan tombol hapus/ubah nama jika di kelas default bawaan agar sistem utama aman
+            const btnEdit = document.getElementById('btn-edit-class');
+            const btnDelete = document.getElementById('btn-delete-class');
+            if (currentSelectedClass === "AFI - 3 Mantingan Guru") {
+                btnEdit.classList.add('opacity-40', 'pointer-events-none');
+                btnDelete.classList.add('opacity-40', 'pointer-events-none');
+            } else {
+                btnEdit.classList.remove('opacity-40', 'pointer-events-none');
+                btnDelete.classList.remove('opacity-40', 'pointer-events-none');
+            }
         }
 
         function loadClassData() {
@@ -529,7 +585,7 @@
                         nameInput.value = match.nama;
                         document.getElementById('student-nim').value = match.nim;
                         autocompleteList.classList.add('hidden');
-                        updateScores();
+                        updateScores(); // PERBAIKAN: Menjamin deskripsi indikator langsung berubah seketika
                     });
                     autocompleteList.appendChild(item);
                 });
@@ -545,6 +601,7 @@
 
         function handleClassChange() {
             currentSelectedClass = document.getElementById('class-selector').value;
+            toggleControlButtons();
             loadClassData();
             showToast(`Pindah ke kelas: ${currentSelectedClass}`, "info");
         }
@@ -564,6 +621,71 @@
             });
         }
 
+        // =========================================================================
+        // FITUR BARU: EDIT NAMA KELAS DAN PADA DATA TERKAIT
+        // =========================================================================
+        function openEditClassModal() {
+            if (currentSelectedClass === "AFI - 3 Mantingan Guru") return;
+            document.getElementById('edit-class-old-name').value = currentSelectedClass;
+            document.getElementById('edit-class-new-name').value = "";
+            document.getElementById('edit-class-modal').classList.remove('hidden');
+        }
+        function closeEditClassModal() { document.getElementById('edit-class-modal').classList.add('hidden'); }
+        
+        function submitEditClassName() {
+            const newName = document.getElementById('edit-class-new-name').value.trim();
+            if (!newName || newName === currentSelectedClass) { closeEditClassModal(); return; }
+
+            const oldKey = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
+            const newKey = encodeURIComponent(newName).replace(/\./g, '%2E');
+
+            // Ambil data nilai di kelas lama terlebih dahulu
+            get(ref(db, `students_scores/${oldKey}`)).then((snapshot) => {
+                const dataNilai = snapshot.exists() ? snapshot.val() : null;
+                
+                // 1. Simpan nama kelas baru di daftar terdaftar
+                set(ref(db, `registered_classes/${newKey}`), true).then(() => {
+                    
+                    // 2. Jika ada data mahasiswa, pindahkan ke wadah nama kelas baru
+                    if (dataNilai) {
+                        set(ref(db, `students_scores/${newKey}`), dataNilai);
+                    }
+                    
+                    // 3. Hapus data kelas lama dari daftar dan dari skor
+                    remove(ref(db, `registered_classes/${oldKey}`));
+                    remove(ref(db, `students_scores/${oldKey}`));
+
+                    currentSelectedClass = newName;
+                    closeEditClassModal();
+                    showToast("Nama kelas berhasil diperbarui!", "success");
+                });
+            }).catch(() => showToast("Gagal merubah nama kelas.", "error"));
+        }
+
+        // =========================================================================
+        // FITUR BARU: HAPUS KELAS TOTAL BESERTA SELURUH ISI NILAINYA
+        // =========================================================================
+        function confirmDeleteClass() {
+            if (currentSelectedClass === "AFI - 3 Mantingan Guru") return;
+            document.getElementById('delete-class-target-name').textContent = currentSelectedClass;
+            document.getElementById('delete-class-modal').classList.remove('hidden');
+        }
+        function closeDeleteClassModal() { document.getElementById('delete-class-modal').classList.add('hidden'); }
+        
+        function submitDeleteClass() {
+            const targetKey = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
+            
+            // Hapus dari indeks pendaftaran kelas dan hapus seluruh struktur datanya
+            remove(ref(db, `registered_classes/${targetKey}`)).then(() => {
+                remove(ref(db, `students_scores/${targetKey}`)).then(() => {
+                    showToast(`Kelas "${currentSelectedClass}" berhasil dihapus total.`, "success");
+                    currentSelectedClass = "AFI - 3 Mantingan Guru"; // kembalikan ke default
+                    closeDeleteClassModal();
+                    loadClassData();
+                });
+            });
+        }
+
         function updateScores() {
             const name = document.getElementById('student-name').value || "Belum Ada Nama";
             const c1 = parseInt(document.getElementById('score-c1').value);
@@ -579,7 +701,7 @@
             document.getElementById('live-student-display').textContent = `Untuk: ${name}`;
             document.getElementById('live-weight-details').textContent = `${(c1*0.4).toFixed(1)} + ${(c2*0.3).toFixed(1)} + ${(c3*0.3).toFixed(1)}`;
 
-            let cat = 'dhaif'; let catLabel = 'ضَعِيفٌ (Dha\'if)';
+            let cat = 'dhaif'; let catLabel = 'جَيِّدٌ (Jayyid)';
             if (finalScore >= 86) { cat = 'mumtaz'; catLabel = 'مُمْتَازٌ (Mumtaz)'; }
             else if (finalScore >= 71) { cat = 'jayyid_jiddan'; catLabel = 'جَيِّدٌ جِدًّا (Jayyid Jiddan)'; }
             else if (finalScore >= 56) { cat = 'jayyid'; catLabel = 'جَيِّدٌ (Jayyid)'; }
@@ -776,6 +898,10 @@
         window.confirmClearAll = confirmClearAll; window.closeDeleteModal = closeDeleteModal; window.clearAllData = clearAllData;
         window.exportToCSV = exportToCSV; window.updateScores = updateScores; window.handleClassChange = handleClassChange;
         window.openAddClassModal = openAddClassModal; window.closeAddClassModal = closeAddClassModal; window.addNewClassSubmit = addNewClassSubmit;
+        
+        // Pemetaan fungsi baru ke objek window (global scope fix)
+        window.openEditClassModal = openEditClassModal; window.closeEditClassModal = closeEditClassModal; window.submitEditClassName = submitEditClassName;
+        window.confirmDeleteClass = confirmDeleteClass; window.closeDeleteClassModal = closeDeleteClassModal; window.submitDeleteClass = submitDeleteClass;
 
         document.getElementById('search-input').addEventListener('input', renderStudents);
         document.getElementById('student-name').addEventListener('input', updateScores);
