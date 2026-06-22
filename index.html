@@ -8,13 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .arabic-text {
-            font-family: 'Amiri', serif;
-            direction: rtl;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .arabic-text { font-family: 'Amiri', serif; direction: rtl; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col pb-12">
@@ -30,7 +28,7 @@
                     <div class="flex items-center gap-2 mt-0.5">
                         <p class="text-xs text-emerald-100">Berdasarkan Rubrik Filsafat & Aqidah (Skala 10 - 100)</p>
                         <span id="db-status-badge" class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-500/30 text-amber-200 border border-amber-500/40 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Offline Mode
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Connecting...
                         </span>
                     </div>
                 </div>
@@ -48,6 +46,27 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 flex-grow w-full">
+        <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-school"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Kelas Aktif Saat Ini</span>
+                    <div class="flex items-center gap-2">
+                        <select id="class-selector" onchange="handleClassChange()" class="text-base font-bold text-slate-800 bg-transparent border-none p-0 pr-6 focus:ring-0 cursor-pointer outline-none">
+                            <option value="AFI - 3 Mantingan Guru">AFI - 3 Mantingan Guru</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="openAddClassModal()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold py-2 px-3.5 rounded-xl border border-emerald-200/60 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-folder-plus"></i> Tambah Kelas Baru
+                </button>
+            </div>
+        </div>
+
         <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
         <div id="tab-input" class="space-y-6">
@@ -68,14 +87,15 @@
                         <input type="hidden" id="edit-id" value="">
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
+                            <div class="relative">
                                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nama Mahasiswi <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                                         <i class="fa-solid fa-user"></i>
                                     </span>
-                                    <input type="text" id="student-name" required placeholder="Contoh: Fatimah Az-Zahra" class="pl-10 w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+                                    <input type="text" id="student-name" autocomplete="off" required placeholder="Ketik nama mahasiswi..." class="pl-10 w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
                                 </div>
+                                <div id="autocomplete-list" class="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-52 overflow-y-auto hidden custom-scroll divide-y divide-slate-100"></div>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">NIM / Nomor Induk</label>
@@ -83,7 +103,7 @@
                                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                                         <i class="fa-solid fa-id-card"></i>
                                     </span>
-                                    <input type="text" id="student-nim" placeholder="Masukkan NIM (Opsional)" class="pl-10 w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+                                    <input type="text" id="student-nim" placeholder="Masukkan NIM (Otomatis/Manual)" class="pl-10 w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
                                 </div>
                             </div>
                         </div>
@@ -155,7 +175,7 @@
                         </div>
 
                         <div class="flex gap-3 pt-2">
-                            <button type="submit" id="btn-submit" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2">
+                            <button type="submit" id="btn-submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian
                             </button>
                         </div>
@@ -163,22 +183,18 @@
                 </div>
 
                 <div class="lg:col-span-5 flex flex-col gap-6">
-                    
                     <div class="bg-gradient-to-br from-emerald-900 to-teal-800 text-white p-6 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between min-h-[220px]">
                         <div class="absolute right-0 bottom-0 opacity-10 translate-x-4 translate-y-4">
                             <i class="fa-solid fa-graduation-cap text-[180px]"></i>
                         </div>
-                        
                         <div class="z-10">
                             <span class="text-emerald-300 text-xs font-bold uppercase tracking-wider">Hasil Perhitungan Berjalan</span>
                             <h3 class="text-white/80 text-sm mt-0.5" id="live-student-display">Untuk: Belum Ada Nama</h3>
                         </div>
-
                         <div class="my-4 z-10 flex items-baseline gap-1">
                             <span class="text-6xl font-black tracking-tight" id="live-final-score">70.0</span>
                             <span class="text-xl text-emerald-300">/ 100</span>
                         </div>
-
                         <div class="flex items-center justify-between z-10 bg-white/10 p-3 rounded-xl border border-white/10 backdrop-blur-sm">
                             <div>
                                 <div class="text-[10px] text-emerald-200 uppercase tracking-widest font-bold">Kategori Nilai</div>
@@ -196,42 +212,24 @@
                             <i class="fa-solid fa-book-open text-teal-600 text-lg"></i>
                             <h3 class="font-bold text-slate-800 text-sm">Deskripsi Indikator Berjalan</h3>
                         </div>
-
-                        <div class="space-y-4 flex-grow overflow-y-auto max-h-[360px] pr-1">
-                            
+                        <div class="space-y-4 flex-grow overflow-y-auto max-h-[360px] pr-1 custom-scroll">
                             <div class="border-l-4 border-emerald-500 pl-3 py-1 space-y-1">
                                 <span class="text-[10px] font-bold text-emerald-600 uppercase">Kriteria 1 - Teologi & Filsafat</span>
-                                <div class="arabic-text text-lg text-emerald-950 font-bold leading-relaxed text-right py-1 bg-emerald-50/50 px-2.5 rounded-lg" id="rubric-desc-c1-ar">
-                                    تَقْدِيمُ حَلَّ سَطْحِي لِلْمُشْكِلَةِ دُونَ رَبْطَ قَوِيٌّ بَيْنَ العَقْلِ وَالْوَحْيِ.
-                                </div>
-                                <p class="text-xs text-slate-600" id="rubric-desc-c1-id">
-                                    Menyajikan solusi dangkal untuk masalah tersebut tanpa hubungan yang kuat antara akal dan wahyu.
-                                </p>
+                                <div class="arabic-text text-lg text-emerald-950 font-bold leading-relaxed text-right py-1 bg-emerald-50/50 px-2.5 rounded-lg" id="rubric-desc-c1-ar">-</div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c1-id">-</p>
                             </div>
-
                             <div class="border-l-4 border-teal-500 pl-3 py-1 space-y-1">
                                 <span class="text-[10px] font-bold text-teal-600 uppercase">Kriteria 2 - Istilah Ilmiah</span>
-                                <div class="arabic-text text-lg text-teal-950 font-bold leading-relaxed text-right py-1 bg-teal-50/50 px-2.5 rounded-lg" id="rubric-desc-c2-ar">
-                                    اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.
-                                </div>
-                                <p class="text-xs text-slate-600" id="rubric-desc-c2-id">
-                                    Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun ide/gagasan.
-                                </p>
+                                <div class="arabic-text text-lg text-teal-950 font-bold leading-relaxed text-right py-1 bg-teal-50/50 px-2.5 rounded-lg" id="rubric-desc-c2-ar">-</div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c2-id">-</p>
                             </div>
-
                             <div class="border-l-4 border-cyan-500 pl-3 py-1 space-y-1">
                                 <span class="text-[10px] font-bold text-cyan-600 uppercase">Kriteria 3 - Struktur Bahasa & Nahwu</span>
-                                <div class="arabic-text text-lg text-cyan-950 font-bold leading-relaxed text-right py-1 bg-cyan-50/50 px-2.5 rounded-lg" id="rubric-desc-c3-ar">
-                                    جُمَلٌ بَسِيطَةٌ جِدًّا مَعَ تَكْرَارِ الأَخْطَاءِ فِي حَرَكَاتِ الإِعْرَابِ كَالْمَرْفُوعَاتِ وَالمَجْرُورَاتِ.
-                                </div>
-                                <p class="text-xs text-slate-600" id="rubric-desc-c3-id">
-                                    Kalimat yang sangat sederhana disertai dengan pengulangan kesalahan dalam tanda I'rab (seperti marfu'at dan majrurat).
-                                </p>
+                                <div class="arabic-text text-lg text-cyan-950 font-bold leading-relaxed text-right py-1 bg-cyan-50/50 px-2.5 rounded-lg" id="rubric-desc-c3-ar">-</div>
+                                <p class="text-xs text-slate-600" id="rubric-desc-c3-id">-</p>
                             </div>
-
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -272,7 +270,7 @@
                 <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-emerald-600"></i> Sebaran Kategori Nilai Mahasiswi
                 </h3>
-                <div class="grid grid-cols-5 gap-2" id="distribution-container">
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="distribution-container">
                     <div class="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-center">
                         <div class="text-[10px] font-bold text-emerald-800">Mumtaz (86-100)</div>
                         <div class="text-lg font-black text-emerald-700 mt-1" id="dist-mumtaz">0</div>
@@ -289,7 +287,7 @@
                         <div class="text-[10px] font-bold text-orange-800">Maqbul (31-55)</div>
                         <div class="text-lg font-black text-orange-700 mt-1" id="dist-maqbul">0</div>
                     </div>
-                    <div class="bg-red-50 border border-red-100 p-2 rounded-xl text-center">
+                    <div class="bg-red-50 border border-red-100 p-2 rounded-xl text-center col-span-2 sm:col-span-1">
                         <div class="text-[10px] font-bold text-red-800">Dha'if (10-30)</div>
                         <div class="text-lg font-black text-red-700 mt-1" id="dist-dhaif">0</div>
                     </div>
@@ -309,7 +307,7 @@
                             <i class="fa-solid fa-file-excel"></i> Ekspor CSV/Excel
                         </button>
                         <button onclick="confirmClearAll()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold py-2 px-4 rounded-xl text-xs sm:text-sm border border-rose-200 transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-trash-can"></i> Hapus Semua Data
+                            <i class="fa-solid fa-trash-can"></i> Hapus Semua Data Kelas Ini
                         </button>
                     </div>
                 </div>
@@ -327,24 +325,36 @@
                                 <th class="py-4 px-6 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="student-table-body" class="divide-y divide-slate-100 text-slate-700 text-sm">
-                            </tbody>
+                        <tbody id="student-table-body" class="divide-y divide-slate-100 text-slate-700 text-sm"></tbody>
                     </table>
                 </div>
 
-                <div id="student-cards-container" class="md:hidden p-4 space-y-4">
-                    </div>
+                <div id="student-cards-container" class="md:hidden p-4 space-y-4"></div>
 
                 <div id="empty-state" class="p-12 text-center space-y-3 hidden">
                     <div class="text-slate-300"><i class="fa-solid fa-folder-open text-6xl"></i></div>
-                    <p class="text-slate-500 font-medium">Belum ada data nilai mahasiswi.</p>
-                    <button onclick="switchTab('input-tab')" class="text-emerald-700 hover:text-emerald-800 font-semibold text-sm underline flex items-center justify-center gap-1 mx-auto">
-                        <i class="fa-solid fa-plus-circle"></i> Mulai Input Sekarang
-                    </button>
+                    <p class="text-slate-500 font-medium">Belum ada data nilai mahasiswi di kelas ini.</p>
                 </div>
             </div>
         </div>
     </main>
+
+    <div id="class-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
+            <div class="flex items-center gap-2 text-emerald-700 bg-emerald-50 w-full p-3 rounded-xl">
+                <i class="fa-solid fa-school text-xl"></i>
+                <h3 class="font-bold text-slate-800 text-base">Tambah Kelas Pengajaran</h3>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nama Kelas Baru</label>
+                <input type="text" id="new-class-name" placeholder="Contoh: AFI - 3 Reguler" class="w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeAddClassModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
+                <button onclick="addNewClassSubmit()" class="flex-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl shadow transition">Simpan Kelas</button>
+            </div>
+        </div>
+    </div>
 
     <div id="delete-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
@@ -352,54 +362,63 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div class="text-center">
-                <h3 class="font-bold text-slate-800 text-lg">Hapus Semua Data?</h3>
-                <p class="text-slate-500 text-xs mt-2">Semua data mahasiswi yang tersimpan akan terhapus secara permanen dari Cloud Database dan lokal. Tindakan ini tidak dapat dibatalkan.</p>
+                <h3 class="font-bold text-slate-800 text-lg">Hapus Data Kelas?</h3>
+                <p class="text-slate-500 text-xs mt-2">Semua data nilai mahasiswi pada kelas aktif akan dihapus secara permanen dari Cloud Database.</p>
             </div>
             <div class="flex gap-3 pt-2">
                 <button onclick="closeDeleteModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
-                <button onclick="clearAllData()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm rounded-xl shadow transition">Ya, Hapus Semua</button>
+                <button onclick="clearAllData()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm rounded-xl shadow transition">Ya, Hapus</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-        // Kamus Data Panduan Rubrik Dinamis Sesuai Berkas Indikator.pdf
         const rubricDatabase = {
             c1: {
-                dhaif: { ar: "عَدَمُ فَهُمِ الْمُشْكِلَةِ الْفَلْسَفِيَّةِ نِهَائِياً، عَنِ النَّصِ دُونَ إِظْهَارِ أَي قُدْرَةٍ أَوْ الكِتَابَةِ خَارِجَ عَلَى التَّحْلِيلِ أَوِ المَوْضُوع.", id: "Sama sekali tidak memahami masalah filosofis dari teks atau menulis di luar topik tanpa menunjukkan kemampuan analisis/kompromi." },
+                dhaif: { ar: "عَدَمُ فَهُمِ الْمُشْكِلَةِ الْفَلْسَفِيَّةِ نِهَائِياً، عَنِ النَّصِ دُونَ إِظْهَارِ أَي قُدْرَةٍ أَوْ الكِتَابَةِ خَارِجَ عَلَى التَّحْلِيلِ أَوِ Mَوْضُوع.", id: "Sama sekali tidak memahami masalah filosofis dari teks atau menulis di luar topik tanpa menunjukkan kemampuan analisis/kompromi." },
                 maqbul: { ar: "نَقْلُ العِبَارَاتِ التَّوْفِيقِ.", id: "Hanya memindahkan/menyalin ungkapan atau kutipan teks rekonsiliasi apa adanya tanpa analisis mandiri." },
                 jayyid: { ar: "تَقْدِيمُ حَلَّ سَطْحِي لِلْمُشْكِلَةِ دُونَ رَبْطَ قَوِيٌّ بَيْنَ العَقْلِ وَالْوَحْيِ.", id: "Menyajikan solusi dangkal untuk masalah tersebut tanpa hubungan yang kuat antara akal dan wahyu." },
                 jayyid_jiddan: { ar: "فَهُمْ صَحِيحٌ لِلْمُشْكِلَةِ مَعَ صِيَاغَةِ حَلَّ مَنْطِقِي دُونَ عَمِيقٍ مَقْبُولٍ تَفْصِيلٍ.", id: "Pemahaman yang benar terhadap masalah disertai rumusan solusi logis yang dapat diterima, namun tanpa rincian logis yang mendalam." },
-                mumtaz: { ar: "قُدْرَةٌ عَالِيَةٌ عَلَى حَلَّ التَّعَارُضِ عَقْلِياً، وَالالْتِزَAMِ بِفِكْرَةِ أَنَّ العَقْلَ أَسَسُ النَّقْلِ بِعُمْقٍ.", id: "Kemampuan sangat tinggi dalam memecahkan kontradiksi secara rasional, serta berkomitmen secara mendalam pada gagasan bahwa akal adalah landasan bagi naql (teks wahyu)." }
+                mumtaz: { ar: "قُدْرَةٌ عَالِيَةٌ عَلَى حَلَّ التَّعَارُضِ عَقْلِياً، وَالالْتِزَامِ بِفِكْرَةِ أَنَّ العَقْلَ أَسَسُ النَّقْلِ بِعُمْقٍ.", id: "Kemampuan sangat tinggi dalam memecahkan kontradiksi secara rasional, serta berkomitmen secara mendalam pada gagasan bahwa akal adalah landasan bagi naql (teks wahyu)." }
             },
             c2: {
-                dhaif: { ar: "خُلُو الوَرَقَةِ تَمَاماً مِنَ الْمُصْطَلَحَاتِ الْعِلْمِيَّةِ المَطْلُوبَةِ.", id: "Lembar jawaban sama sekali tidak memuat istilah-istilah ilmiah yang diwajibkan." },
-                maqbul: { ar: "ذِكْرُ الْمُصْطَلَحَاتِ كَكَلِمَاتٍ مُفْرَدَةِ دُونَ إِدْخَالِهَا فِي جُمَلٍ مُفِيدَةٍ.", id: "Hanya menyebutkan istilah-istilah sebagai kata tunggal terpisah tanpa memasukkannya ke dalam kalimat yang bermakna." },
-                jayyid: { ar: "اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.", id: "Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun alur ide/gagasan." },
-                jayyid_jiddan: { ar: "اسْتِخْدَامُ مُصْطَلَحَيْنِ فَقَطٍ بِشَكْلٍ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ.", id: "Hanya menggunakan dua istilah saja, namun keduanya telah diletakkan secara benar dan tepat dalam ekspresi kalimat." },
-                mumtaz: { ar: "اسْتِخْدَامُ جَمِيعِ الْمُصْطَلَحَاتِ (قَانُوناً كلياً، تَأْوِيلِ النَّصِ، أَسَسُ النَّقْلِ) فِي سِيَاقِهَا الصحيح دائماً.", id: "Menggunakan semua istilah wajib (qanunan kulliyan, ta'wilin nass, asasun naql) dalam konteks kalimat yang selalu benar dan tepat." }
+                dhaif: { ar: "خُلُو الوَرَقَةِ تَمَAMاً مِنَ الْمُصْطَلَحَاتِ الْعِلْمِيَّةِ المَطْلُوبَةِ.", id: "Lembar jawaban sama sekali tidak memuat istilah-istilah ilmiah yang diwajibkan." },
+                maqbul: { ar: "ذِكْرُ الْمُصْطَلَحَاتِ كَكَلِمَاتٍ مُفْرَدِ دُونَ إِدْخَالِهَا فِي جُمَلٍ مُفِيدَةٍ.", id: "Hanya menyebutkan istilah-istilah sebagai kata tunggal terpisah tanpa memasukkannya ke dalam kalimat yang bermakna." },
+                jayyid: { ar: "اسْتِخْدَامُ مُصْطَلَحٍ وَاحِدٍ فَقَطْ مَعَ ضَعْفِ تَفْعِيلِهِ فِي بِنَاءِ الفِكْرَةِ.", id: "Hanya menggunakan satu istilah saja dengan kelemahan pengaplikasiannya dalam membangun ide/gagasan." },
+                jayyid_jiddan: { ar: "اسْتِخْدَامُ مُصْطَلَحَيْنِ فِي تَأْوِيلِ النَّصِ، أَسَسُ النَّقْلِ فِي سِيَاقِهَا الصحيح دائماً.", id: "Menggunakan dua istilah dalam interpretasi teks, memposisikan fondasi naql dalam konteksnya yang selalu tepat." },
+                mumtaz: { ar: "اسْتِخْدَامُ جَمِيعِ الْمُصْطَلَحَاتِ (قَانُوناً كلياً ، كِتَابَةٌ لُغَوِيَّةٌ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ).", id: "Menggunakan seluruh istilah ilmiah yang diminta secara komprehensif, dengan penulisan bahasa yang benar serta ekspresi yang sangat akurat." }
             },
             c3: {
-                dhaif: { ar: "الاعْتِمَADُ عَلَى كَلِمَاتٍ مُتَقَطِعَةٍ، مَعَ كَثْرَةِ الْأَخْطَاءِ الَّتِي تُفْسِدُ البِنَاءَ اللغوي.", id: "Sangat bergantung pada kata terputus-putus, disertai banyak kesalahan fatal yang merusak struktur bangunan tata bahasa." },
-                maqbul: { ar: "رَكَاكَةٌ شَدِيدَةٌ فِي صِيَاغَةِ الفِكْرَةِ.", id: "Kelemahan dan kekakuan yang sangat parah dalam menyusun rangkaian kalimat penjelas gagasan." },
-                jayyid: { ar: "جُمَلٌ بَسِيطَةٌ جِدًّا مَعَ تَكْرَARِ الأَخْطَاءِ فِي حَرَكَاتِ الإِعْرَابِ كَالْمَرْفُوعَاتِ وَالمَجْرُورَاتِ.", id: "Kalimat yang sangat sederhana disertai dengan pengulangan kesalahan dalam tanda I'rab (seperti marfu'at dan majrurat)." },
-                jayyid_jiddan: { ar: "صِيَاغَةُ جُمَلٍ مُرَكَّبَةٍ لَكِنْ لَا تَخْلُو مِنْ أَخْطَاءٍ إِمْلَائِيَّةٍ أَوْ نَحْوِيَّةٍ خَفِيفَةٍ.", id: "Berhasil menyusun kalimat majemuk/kompleks, namun masih dijumpai beberapa kesalahan ejaan (Imla') atau sintaksis (Nahwu) yang ringan." },
-                mumtaz: { ar: "كِتَابَةٌ لُغَوِيَّةٌ صَحِيحَةٌ وَدَقِيقَةٌ فِي التَّعْبِيرِ عَنِ الفِكْرَةِ مَعَ سَلَامَةِ الإِعْرَابِ وَالإِمْلَاء غَالِبَاً.", id: "Gaya penulisan bahasa yang benar, akurat, dan fasih dalam mengekspresikan gagasan disertai ketepatan I'rab dan ejaan secara konsisten." }
+                dhaif: { ar: "رَكَاكَةٌ شَدِيدَةٌ فِي صِيَاغَةُ جُمَلٍ مُرَكَّبَةٍ كِتَابَةٌ لُغَوِيَّةٌ.", id: "Kelemahan/kerancuan yang sangat parah dalam menyusun kalimat majemuk secara struktur kebahasaan." },
+                maqbul: { ar: "جُمَلٌ بَسِيطَةٌ جِدًّا مَعَ تَكْرَارِ الأَخْطَاءِ فِي حَرَكَاتِ الإِعْرَابِ كَالْمَرْفُوعَاتِ وَالمَجْرُورَاتِ.", id: "Kalimat yang sangat sederhana disertai dengan pengulangan kesalahan dalam tanda I'rab (seperti marfu'at dan majrurat)." },
+                jayyid: { ar: "جُمَلٌ بَسِيطَةٌ جِدًّا مَعَ تَكْرَارِ الأَخْطَاءِ فِي حَرَكَاتِ الإِعْرَابِ كَالْمَرْفُوعَاتِ وَالمَجْرُورَاتِ.", id: "Kalimat yang sangat sederhana disertai dengan pengulangan kesalahan dalam tanda I'rab (seperti marfu'at dan majrurat)." },
+                jayyid_jiddan: { ar: "صِيَاغَةُ جُمَلٍ مُرَكَّبَةٍ كِتَابَةٌ لُغَوِيَّةٌ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ.", id: "Berhasil menyusun kalimat majemuk dengan penulisan bahasa yang benar serta ekspresi yang akurat." },
+                mumtaz: { ar: "صِيَاغَةُ جُمَلٍ مُرَكَّبَةٍ كِتَابَةٌ لُغَوِيَّةٌ صَحِيحِ وَدَقِيقِ فِي التَّعْبِيرِ مَعَ خُلُوّ النَّصّ مِن الأخْطَاءِ.", id: "Mampu memformulasi kalimat-kalimat kompleks/majemuk dengan tata bahasa murni yang benar, presisi, serta bersih total dari kekeliruan." }
             }
         };
 
-        // Database & Konfigurasi Firebase Lokal Anda
-        let students = [];
-        let isFirebaseActive = false;
-        let db = null;
-        let auth = null;
-        let appId = 'kalkulator-afi-3';
+        const studentDatabasePreset = [
+            { nama: "DANIA MUNISA PRATAMA", nim: "462025223042" },
+            { nama: "MIFTAHUL SYIFA 'AZIZAH", nim: "462025223044" },
+            { nama: "FITYA FURSANILLA", nim: "462025223048" },
+            { nama: "KHAIRANI FEBRI YANTI", nim: "462025223049" },
+            { nama: "IKFINA KAFFAH", nim: "462025223051" },
+            { nama: "MEI ALFIYAH", nim: "462025223056" },
+            { nama: "MAITSAA NIKHLATUN NABILA", nim: "462025223061" },
+            { nama: "DITA DEWI LARASATI", nim: "462025223063" },
+            { nama: "SERUNI AQILA HADHI", nim: "462025223066" },
+            { nama: "NADYA ULYA Z.P", nim: "462025223068" },
+            { nama: "NABILA KHASNA", nim: "462025223174" }
+        ];
 
-        const myFirebaseConfig = {
+        // =========================================================================
+        // MASUKKAN KREDENSIAL ASLI FIREBASE CONSOLE ANDA DI SINI
+        // =========================================================================
+        const firebaseConfig = {
             apiKey: "AIzaSyBDQD1i-55YCbvNdTR1W1BlpTlzBAq7c5w",
             authDomain: "kalkulator-afi-3.firebaseapp.com",
             databaseURL: "https://kalkulator-afi-3-default-rtdb.firebaseio.com",
@@ -409,72 +428,63 @@
             appId: "1:185079451921:web:91cdb4150ab4e5a931fcb0"
         };
 
-        // Jalankan Inisialisasi Database Realtime
-        async function initializeDatabase() {
-            const statusBadge = document.getElementById('db-status-badge');
-            if (myFirebaseConfig.apiKey) {
-                try {
-                    const app = initializeApp(myFirebaseConfig);
-                    auth = getAuth(app);
-                    db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // PERBAIKAN FATAL: Memaksa inisialisasi getDatabase menggunakan alamat URL eksplisit dari config
+        const db = getDatabase(app, firebaseConfig.databaseURL);
 
-                    await signInAnonymously(auth);
-                    
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            isFirebaseActive = true;
-                            statusBadge.className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-500/40 flex items-center gap-1";
-                            statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online Database`;
-                            
-                            // Mendengarkan perubahan data secara Real-time dari Firebase node 'students'
-                            const studentsRef = ref(db, 'students');
-                            onValue(studentsRef, (snapshot) => {
-                                const data = snapshot.val();
-                                students = [];
-                                if (data) {
-                                    Object.keys(data).forEach(key => {
-                                        students.push({ id: key, ...data[key] });
-                                    });
-                                }
-                                renderStudents();
-                                updateStats();
-                            });
-                        }
-                    });
-                } catch (err) {
-                    console.error("Gagal koneksi Firebase Realtime Database:", err);
-                    isFirebaseActive = false;
-                    loadLocalData();
+        let currentSelectedClass = "AFI - 3 Mantingan Guru";
+        let localStudentsData = [];
+
+        function initializeDatabase() {
+            signInAnonymously(auth).then(() => {
+                const classesRef = ref(db, 'registered_classes');
+                onValue(classesRef, (snapshot) => {
+                    const selector = document.getElementById('class-selector');
+                    selector.innerHTML = '<option value="AFI - 3 Mantingan Guru">AFI - 3 Mantingan Guru</option>';
+                    if (snapshot.exists()) {
+                        const classesData = snapshot.val();
+                        Object.keys(classesData).forEach(className => {
+                            if (className !== "AFI - 3 Mantingan Guru") {
+                                const option = document.createElement('option');
+                                option.value = className;
+                                option.textContent = className;
+                                selector.appendChild(option);
+                            }
+                        });
+                    }
+                    selector.value = currentSelectedClass;
+                });
+
+                loadClassData();
+                document.getElementById('db-status-badge').className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1";
+                document.getElementById('db-status-badge').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Cloud Connected';
+            }).catch((err) => {
+                console.error("Firebase Connection Error:", err);
+                document.getElementById('db-status-badge').className = "px-2 py-0.5 text-[9px] font-bold rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1";
+                document.getElementById('db-status-badge').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Offline Mode';
+            });
+        }
+
+        function loadClassData() {
+            const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
+            const studentRef = ref(db, `students_scores/${safeClassPath}`);
+            onValue(studentRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const cloudData = snapshot.val();
+                    localStudentsData = Object.keys(cloudData).map(key => ({
+                        id: key,
+                        ...cloudData[key]
+                    }));
+                } else {
+                    localStudentsData = [];
                 }
-            } else {
-                loadLocalData();
-            }
+                renderStudents();
+                updateGlobalStatistics();
+            });
         }
 
-        function loadLocalData() {
-            const localData = localStorage.getItem('mahasiswi_grades');
-            students = localData ? JSON.parse(localData) : [];
-            renderStudents();
-            updateStats();
-        }
-
-        // Tampilan Toast Otomatis
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = "pointer-events-auto bg-slate-900/95 text-white text-xs font-medium py-2.5 px-4 rounded-xl shadow-lg border border-slate-700/50 flex items-center gap-2 transition-all duration-300 translate-x-10 opacity-0";
-            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.remove('translate-x-10', 'opacity-0');
-            }, 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-x-5');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // Navigasi Tab Layar
         function switchTab(tabId) {
             const tabInput = document.getElementById('tab-input');
             const tabList = document.getElementById('tab-list');
@@ -489,401 +499,288 @@
             } else {
                 tabInput.classList.add('hidden');
                 tabList.classList.remove('hidden');
-                btnList.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow";
                 btnInput.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white hover:bg-white/10";
+                btnList.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow";
+                renderStudents();
             }
         }
 
-        // Shortcut Set Nilai tombol cepat
-        function setScore(id, value) {
-            document.getElementById(id).value = value;
-            updateScores();
+        const nameInput = document.getElementById('student-name');
+        const autocompleteList = document.getElementById('autocomplete-list');
+
+        nameInput.addEventListener('input', function() {
+            const val = this.value;
+            autocompleteList.innerHTML = '';
+            if (!val) { autocompleteList.classList.add('hidden'); return; }
+
+            const matches = studentDatabasePreset.filter(s => s.nama.toUpperCase().includes(val.toUpperCase()) || s.nim.includes(val));
+            
+            if (matches.length === 0) {
+                const noMatchDiv = document.createElement('div');
+                noMatchDiv.className = "p-2.5 text-xs text-slate-500 italic bg-slate-50";
+                noMatchDiv.textContent = "Bukan nama bawaan Excel. Silakan lanjutkan entri nama baru.";
+                autocompleteList.appendChild(noMatchDiv);
+            } else {
+                matches.forEach(match => {
+                    const item = document.createElement('div');
+                    item.className = "p-2.5 text-xs text-slate-700 hover:bg-emerald-50 cursor-pointer flex justify-between items-center transition";
+                    item.innerHTML = `<div><strong class="text-slate-900">${match.nama}</strong></div><div class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">${match.nim}</div>`;
+                    item.addEventListener('click', function() {
+                        nameInput.value = match.nama;
+                        document.getElementById('student-nim').value = match.nim;
+                        autocompleteList.classList.add('hidden');
+                        updateScores();
+                    });
+                    autocompleteList.appendChild(item);
+                });
+            }
+            autocompleteList.classList.remove('hidden');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (e.target !== nameInput && e.target !== autocompleteList) {
+                autocompleteList.classList.add('hidden');
+            }
+        });
+
+        function handleClassChange() {
+            currentSelectedClass = document.getElementById('class-selector').value;
+            loadClassData();
+            showToast(`Pindah ke kelas: ${currentSelectedClass}`, "info");
         }
 
-        // Mengambil kategori penilaian berdasarkan rubrik
-        function getCategoryDetails(score) {
-            if (score >= 86 && score <= 100) return { name: "مُمْتَازٌ (Mumtaz)", class: "bg-emerald-100 text-emerald-800 border-emerald-200", badge: "bg-emerald-600", key: "mumtaz" };
-            if (score >= 71 && score <= 85) return { name: "جَيِّدٌ جِدًا (Jayyid Jiddan)", class: "bg-blue-100 text-blue-800 border-blue-200", badge: "bg-blue-600", key: "jayyid_jiddan" };
-            if (score >= 56 && score <= 70) return { name: "جَيِّدٌ (Jayyid)", class: "bg-yellow-100 text-yellow-800 border-yellow-200", badge: "bg-yellow-600", key: "jayyid" };
-            if (score >= 31 && score <= 55) return { name: "مَقْبُولٌ (Maqbul)", class: "bg-orange-100 text-orange-800 border-orange-200", badge: "bg-orange-600", key: "maqbul" };
-            return { name: "ضَعِيفٌ (Dha'if)", class: "bg-red-100 text-red-800 border-red-200", badge: "bg-red-600", key: "dhaif" };
+        function openAddClassModal() { document.getElementById('class-modal').classList.remove('hidden'); }
+        function closeAddClassModal() { document.getElementById('class-modal').classList.add('hidden'); }
+
+        function addNewClassSubmit() {
+            const newClassName = document.getElementById('new-class-name').value.trim();
+            if(!newClassName) return;
+            const cleanKey = encodeURIComponent(newClassName).replace(/\./g, '%2E');
+            set(ref(db, `registered_classes/${cleanKey}`), true).then(() => {
+                currentSelectedClass = newClassName;
+                document.getElementById('new-class-name').value = "";
+                closeAddClassModal();
+                showToast(`Kelas "${newClassName}" berhasil dibuat!`, "success");
+            });
         }
 
-        // Menentukan range kunci rubrik deskripsi dinamis
-        function getRubricKey(val) {
-            if (val >= 86) return "mumtaz";
-            if (val >= 71) return "jayyid_jiddan";
-            if (val >= 56) return "jayyid";
-            if (val >= 31) return "maqbul";
-            return "dhaif";
-        }
-
-        // Live calculation & Sinkronisasi deskripsi berjalan (Bobot Akurat 40-30-30)
         function updateScores() {
-            const name = document.getElementById('student-name').value.trim() || "Belum Ada Nama";
+            const name = document.getElementById('student-name').value || "Belum Ada Nama";
             const c1 = parseInt(document.getElementById('score-c1').value);
             const c2 = parseInt(document.getElementById('score-c2').value);
             const c3 = parseInt(document.getElementById('score-c3').value);
 
-            document.getElementById('val-c1').innerText = c1;
-            document.getElementById('val-c2').innerText = c2;
-            document.getElementById('val-c3').innerText = c3;
+            document.getElementById('val-c1').textContent = c1;
+            document.getElementById('val-c2').textContent = c2;
+            document.getElementById('val-c3').textContent = c3;
 
-            document.getElementById('live-student-display').innerText = `Untuk: ${name}`;
+            const finalScore = (c1 * 0.4) + (c2 * 0.3) + (c3 * 0.3);
+            document.getElementById('live-final-score').textContent = finalScore.toFixed(1);
+            document.getElementById('live-student-display').textContent = `Untuk: ${name}`;
+            document.getElementById('live-weight-details').textContent = `${(c1*0.4).toFixed(1)} + ${(c2*0.3).toFixed(1)} + ${(c3*0.3).toFixed(1)}`;
 
-            // Penghitungan bobot riil 40% - 30% - 30%
-            const w1 = c1 * 0.40;
-            const w2 = c2 * 0.30;
-            const w3 = c3 * 0.30;
-            const finalScore = w1 + w2 + w3;
+            let cat = 'dhaif'; let catLabel = 'ضَعِيفٌ (Dha\'if)';
+            if (finalScore >= 86) { cat = 'mumtaz'; catLabel = 'مُمْتَازٌ (Mumtaz)'; }
+            else if (finalScore >= 71) { cat = 'jayyid_jiddan'; catLabel = 'جَيِّدٌ جِدًّا (Jayyid Jiddan)'; }
+            else if (finalScore >= 56) { cat = 'jayyid'; catLabel = 'جَيِّدٌ (Jayyid)'; }
+            else if (finalScore >= 31) { cat = 'maqbul'; catLabel = 'مَقْبُولٌ (Maqbul)'; }
 
-            document.getElementById('live-final-score').innerText = finalScore.toFixed(1);
-            document.getElementById('live-weight-details').innerText = `${w1.toFixed(1)} + ${w2.toFixed(1)} + ${w3.toFixed(1)}`;
+            document.getElementById('live-grade-category').textContent = catLabel;
 
-            const cat = getCategoryDetails(Math.round(finalScore));
-            document.getElementById('live-grade-category').innerText = cat.name;
+            const getCatByScore = (s) => {
+                if(s >= 86) return 'mumtaz'; if(s >= 71) return 'jayyid_jiddan';
+                if(s >= 56) return 'jayyid'; if(s >= 31) return 'maqbul'; return 'dhaif';
+            };
 
-            // Update Teks Deskripsi Rubrik Dinamis berjalan di panel kanan
-            const k1 = getRubricKey(c1);
-            const k2 = getRubricKey(c2);
-            const k3 = getRubricKey(c3);
-
-            document.getElementById('rubric-desc-c1-ar').innerText = rubricDatabase.c1[k1].ar;
-            document.getElementById('rubric-desc-c1-id').innerText = rubricDatabase.c1[k1].id;
-            document.getElementById('rubric-desc-c2-ar').innerText = rubricDatabase.c2[k2].ar;
-            document.getElementById('rubric-desc-c2-id').innerText = rubricDatabase.c2[k2].id;
-            document.getElementById('rubric-desc-c3-ar').innerText = rubricDatabase.c3[k3].ar;
-            document.getElementById('rubric-desc-c3-id').innerText = rubricDatabase.c3[k3].id;
+            document.getElementById('rubric-desc-c1-ar').textContent = rubricDatabase.c1[getCatByScore(c1)].ar;
+            document.getElementById('rubric-desc-c1-id').textContent = rubricDatabase.c1[getCatByScore(c1)].id;
+            document.getElementById('rubric-desc-c2-ar').textContent = rubricDatabase.c2[getCatByScore(c2)].ar;
+            document.getElementById('rubric-desc-c2-id').textContent = rubricDatabase.c2[getCatByScore(c2)].id;
+            document.getElementById('rubric-desc-c3-ar').textContent = rubricDatabase.c3[getCatByScore(c3)].ar;
+            document.getElementById('rubric-desc-c3-id').textContent = rubricDatabase.c3[getCatByScore(c3)].id;
         }
 
-        // Membersihkan form input kembali semula
+        function setScore(id, val) { document.getElementById(id).value = val; updateScores(); }
+
         function resetForm() {
             document.getElementById('calc-form').reset();
             document.getElementById('edit-id').value = '';
-            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-circle-info text-emerald-600 text-lg"></i> Form Input & Penilaian Mahasiswi`;
-            document.getElementById('btn-submit').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian`;
+            document.getElementById('form-title').textContent = "Form Input & Penilaian Mahasiswi";
+            document.getElementById('btn-submit').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian';
+            setScore('score-c1', 70); setScore('score-c2', 70); setScore('score-c3', 70);
             updateScores();
         }
 
-        // Menyimpan / Memperbarui Data ke Realtime Database
-        async function saveStudent(event) {
-            event.preventDefault();
+        function saveStudent(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value || 'std_' + Date.now();
             const name = document.getElementById('student-name').value.trim();
             const nim = document.getElementById('student-nim').value.trim() || "-";
             const c1 = parseInt(document.getElementById('score-c1').value);
             const c2 = parseInt(document.getElementById('score-c2').value);
             const c3 = parseInt(document.getElementById('score-c3').value);
-            const finalScore = (c1 * 0.40) + (c2 * 0.30) + (c3 * 0.30);
-            const editId = document.getElementById('edit-id').value;
+            const finalScore = (c1 * 0.4) + (c2 * 0.3) + (c3 * 0.3);
 
-            if (!name) return;
+            const studentData = { name, nim, c1, c2, c3, finalScore, timestamp: Date.now() };
+            const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
 
-            const id = editId || 'student_' + Date.now();
-            const dataPayload = {
-                name, nim, c1, c2, c3, finalScore,
-                timestamp: new Date().toISOString()
-            };
-
-            if (isFirebaseActive && db) {
-                try {
-                    await set(ref(db, 'students/' + id), dataPayload);
-                    showToast(editId ? "Nilai berhasil diperbarui di cloud database!" : "Nilai baru berhasil disinkronkan ke cloud database!");
-                } catch (err) {
-                    console.error("Gagal kirim ke Realtime DB:", err);
-                    showToast("Gagal menyimpan ke cloud. Menggunakan memori lokal.");
-                }
-            } else {
-                // FALLBACK LOKAL jika offline
-                if (editId) {
-                    const index = students.findIndex(s => s.id === editId);
-                    if (index !== -1) students[index] = { id: editId, ...dataPayload };
-                } else {
-                    students.push({ id, ...dataPayload });
-                }
-                localStorage.setItem('mahasiswi_grades', JSON.stringify(students));
-                showToast("Nilai berhasil disimpan di memori lokal!");
-                renderStudents();
-                updateStats();
-            }
-
-            resetForm();
-            switchTab('list-tab');
+            set(ref(db, `students_scores/${safeClassPath}/${id}`), studentData).then(() => {
+                showToast(`Sukses menyimpan nilai ${name}!`, "success");
+                resetForm();
+                switchTab('list-tab');
+            }).catch(e => showToast("Gagal menyimpan! Periksa koneksi Firebase.", "error"));
         }
 
-        // Memuat ulang daftar mahasiswi ke tabel desktop & mobile card view
+        function editStudent(id) {
+            const student = localStudentsData.find(s => s.id === id);
+            if (!student) return;
+            document.getElementById('edit-id').value = student.id;
+            document.getElementById('student-name').value = student.name;
+            document.getElementById('student-nim').value = student.nim === "-" ? "" : student.nim;
+            document.getElementById('score-c1').value = student.c1;
+            document.getElementById('score-c2').value = student.c2;
+            document.getElementById('score-c3').value = student.c3;
+            document.getElementById('form-title').textContent = `Edit Penilaian: ${student.name}`;
+            document.getElementById('btn-submit').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Perbarui Penilaian';
+            switchTab('input-tab');
+            updateScores();
+        }
+
+        function deleteStudent(id, name) {
+            if (confirm(`Hapus data nilai ${name}?`)) {
+                const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
+                remove(ref(db, `students_scores/${safeClassPath}/${id}`));
+            }
+        }
+
+        function confirmClearAll() { document.getElementById('delete-modal').classList.remove('hidden'); }
+        function closeDeleteModal() { document.getElementById('delete-modal').classList.add('hidden'); }
+        function clearAllData() {
+            const safeClassPath = encodeURIComponent(currentSelectedClass).replace(/\./g, '%2E');
+            remove(ref(db, `students_scores/${safeClassPath}`)).then(() => closeDeleteModal());
+        }
+
         function renderStudents() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const tableBody = document.getElementById('student-table-body');
+            const tbody = document.getElementById('student-table-body');
             const cardContainer = document.getElementById('student-cards-container');
             const emptyState = document.getElementById('empty-state');
+            const searchKeyword = document.getElementById('search-input').value.toLowerCase();
 
-            tableBody.innerHTML = '';
-            cardContainer.innerHTML = '';
-
-            const filtered = students.filter(s => 
-                (s.name && s.name.toLowerCase().includes(query)) || 
-                (s.nim && s.nim.toLowerCase().includes(query))
-            );
-
-            document.getElementById('badge-count').innerText = students.length;
-            if (students.length > 0) {
-                document.getElementById('badge-count').classList.remove('hidden');
-            } else {
-                document.getElementById('badge-count').classList.add('hidden');
-            }
+            tbody.innerHTML = ''; cardContainer.innerHTML = '';
+            const filtered = localStudentsData.filter(s => s.name.toLowerCase().includes(searchKeyword) || s.nim.toLowerCase().includes(searchKeyword));
 
             if (filtered.length === 0) {
                 emptyState.classList.remove('hidden');
+                document.getElementById('badge-count').classList.add('hidden');
                 return;
             }
+
             emptyState.classList.add('hidden');
+            document.getElementById('badge-count').classList.remove('hidden');
+            document.getElementById('badge-count').textContent = filtered.length;
 
-            filtered.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+            filtered.sort((a,b) => b.timestamp - a.timestamp).forEach(s => {
+                let badgeStyle = "bg-red-50 text-red-700 border-red-200"; let arabicLabel = "ضعيف";
+                if (s.finalScore >= 86) { badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200"; arabicLabel = "ممتاز"; }
+                else if (s.finalScore >= 71) { badgeStyle = "bg-blue-50 text-blue-700 border-blue-200"; arabicLabel = "جيد جدا"; }
+                else if (s.finalScore >= 56) { badgeStyle = "bg-yellow-50 text-yellow-700 border-yellow-200"; arabicLabel = "جيد"; }
+                else if (s.finalScore >= 31) { badgeStyle = "bg-orange-50 text-orange-700 border-orange-200"; arabicLabel = "مقبول"; }
 
-            filtered.forEach(s => {
-                const cat = getCategoryDetails(Math.round(s.finalScore));
-                
-                // Elemen Baris Tabel Desktop
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
+                tr.className = "hover:bg-slate-50/80 transition";
                 tr.innerHTML = `
-                    <td class="py-4 px-6">
-                        <div class="font-semibold text-slate-800">${s.name}</div>
-                        <div class="text-xs text-slate-400 font-mono mt-0.5"><i class="fa-solid fa-id-card"></i> ${s.nim}</div>
-                    </td>
-                    <td class="py-4 px-6 text-center font-medium">${s.c1} <span class="text-xs text-slate-400 block">(${(s.c1*0.4).toFixed(1)})</span></td>
-                    <td class="py-4 px-6 text-center font-medium">${s.c2} <span class="text-xs text-slate-400 block">(${(s.c2*0.3).toFixed(1)})</span></td>
-                    <td class="py-4 px-6 text-center font-medium">${s.c3} <span class="text-xs text-slate-400 block">(${(s.c3*0.3).toFixed(1)})</span></td>
-                    <td class="py-4 px-6 text-center font-black text-emerald-800 text-base">${s.finalScore.toFixed(1)}</td>
-                    <td class="py-4 px-6 text-center">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold border ${cat.class}">
-                            ${cat.name}
-                        </span>
-                    </td>
-                    <td class="py-4 px-6 text-right">
-                        <div class="flex justify-end gap-2">
-                            <button onclick="editStudent('${s.id}')" class="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition" title="Edit Nilai">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button onclick="deleteStudent('${s.id}')" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="Hapus Data">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
+                    <td class="py-3.5 px-6"><div class="font-bold text-slate-800">${s.name}</div><div class="text-xs text-slate-400 mt-0.5">NIM: ${s.nim}</div></td>
+                    <td class="py-3.5 px-6 text-center font-medium">${s.c1}</td>
+                    <td class="py-3.5 px-6 text-center font-medium">${s.c2}</td>
+                    <td class="py-3.5 px-6 text-center font-medium">${s.c3}</td>
+                    <td class="py-3.5 px-6 text-center"><span class="text-base font-black text-emerald-700">${s.finalScore.toFixed(1)}</span></td>
+                    <td class="py-3.5 px-6 text-center"><span class="px-2.5 py-1 text-xs font-bold rounded-xl border ${badgeStyle} flex items-center justify-center gap-1.5 w-max mx-auto"><span class="arabic-text font-bold">${arabicLabel}</span></span></td>
+                    <td class="py-3.5 px-6 text-right"><div class="flex items-center justify-end gap-1.5"><button onclick="editStudent('${s.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteStudent('${s.id}', '${s.name}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i class="fa-solid fa-trash-can"></i></button></div></td>
                 `;
-                tableBody.appendChild(tr);
+                tbody.appendChild(tr);
 
-                // Elemen Tampilan Mobile Card
                 const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 space-y-3";
+                card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3";
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-base leading-tight">${s.name}</h4>
-                            <span class="text-xs text-slate-400 font-mono mt-1 block"><i class="fa-solid fa-id-card"></i> ${s.nim}</span>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-2xl font-black text-emerald-800">${s.finalScore.toFixed(1)}</div>
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border block mt-1 ${cat.class}">${cat.name}</span>
-                        </div>
+                    <div class="flex justify-between items-start"><div><h4 class="font-bold text-slate-800">${s.name}</h4><p class="text-xs text-slate-400 mt-0.5">NIM: ${s.nim}</p></div><span class="px-2 py-0.5 text-[11px] font-bold rounded-lg border ${badgeStyle}">${arabicLabel}</span></div>
+                    <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded-lg text-center text-xs">
+                        <div><div class="text-slate-400 text-[10px]">Filsafat</div><div class="font-bold mt-0.5">${s.c1}</div></div>
+                        <div><div class="text-slate-400 text-[10px]">Istilah</div><div class="font-bold mt-0.5">${s.c2}</div></div>
+                        <div><div class="text-slate-400 text-[10px]">Bahasa</div><div class="font-bold mt-0.5">${s.c3}</div></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-lg text-center text-xs">
-                        <div>
-                            <span class="text-slate-400 block text-[9px] uppercase font-bold">1. Filsafat (40%)</span>
-                            <span class="font-semibold text-slate-700">${s.c1}</span>
-                            <span class="text-slate-400 text-[10px] block">(${(s.c1*0.4).toFixed(1)})</span>
-                        </div>
-                        <div class="border-x border-slate-200">
-                            <span class="text-slate-400 block text-[9px] uppercase font-bold">2. Istilah (30%)</span>
-                            <span class="font-semibold text-slate-700">${s.c2}</span>
-                            <span class="text-slate-400 text-[10px] block">(${(s.c2*0.3).toFixed(1)})</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block text-[9px] uppercase font-bold">3. Bahasa (30%)</span>
-                            <span class="font-semibold text-slate-700">${s.c3}</span>
-                            <span class="text-slate-400 text-[10px] block">(${(s.c3*0.3).toFixed(1)})</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-2 pt-1 border-t border-slate-100">
-                        <button onclick="editStudent('${s.id}')" class="flex-1 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-pen-to-square"></i> Ubah
-                        </button>
-                        <button onclick="deleteStudent('${s.id}')" class="flex-1 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-trash"></i> Hapus
-                        </button>
+                    <div class="flex justify-between items-center pt-1 border-t border-slate-100">
+                        <div><span class="text-xs text-slate-400">Skor:</span> <span class="text-base font-black text-emerald-700">${s.finalScore.toFixed(1)}</span></div>
+                        <div class="flex gap-1"><button onclick="editStudent('${s.id}')" class="px-2 py-1 text-xs text-blue-600 font-bold rounded-lg"><i class="fa-solid fa-pen-to-square mr-1"></i></button><button onclick="deleteStudent('${s.id}', '${s.name}')" class="px-2 py-1 text-xs text-rose-600 font-bold rounded-lg"><i class="fa-solid fa-trash-can mr-1"></i></button></div>
                     </div>
                 `;
                 cardContainer.appendChild(card);
             });
         }
 
-        // Kalkulasi Statistik Kumulatif Kelas
-        function updateStats() {
-            if (students.length === 0) {
-                document.getElementById('stat-total').innerText = '0';
-                document.getElementById('stat-average').innerText = '0.0';
-                document.getElementById('stat-max').innerText = '0';
-                document.getElementById('stat-min').innerText = '0';
-                document.getElementById('dist-mumtaz').innerText = '0';
-                document.getElementById('dist-jj').innerText = '0';
-                document.getElementById('dist-jayyid').innerText = '0';
-                document.getElementById('dist-maqbul').innerText = '0';
-                document.getElementById('dist-dhaif').innerText = '0';
+        function updateGlobalStatistics() {
+            const count = localStudentsData.length;
+            document.getElementById('stat-total').textContent = count;
+            if (count === 0) {
+                document.getElementById('stat-average').textContent = "0.0"; document.getElementById('stat-max').textContent = "0"; document.getElementById('stat-min').textContent = "0";
+                document.getElementById('dist-mumtaz').textContent = "0"; document.getElementById('dist-jj').textContent = "0"; document.getElementById('dist-jayyid').textContent = "0"; document.getElementById('dist-maqbul').textContent = "0"; document.getElementById('dist-dhaif').textContent = "0";
                 return;
             }
+            const scores = localStudentsData.map(s => s.finalScore);
+            const sum = scores.reduce((a, b) => a + b, 0);
+            document.getElementById('stat-average').textContent = (sum / count).toFixed(1);
+            document.getElementById('stat-max').textContent = Math.max(...scores).toFixed(1);
+            document.getElementById('stat-min').textContent = Math.min(...scores).toFixed(1);
 
-            let total = students.length;
-            let sum = 0;
-            let max = 0;
-            let min = 100;
-
-            let dist = { mumtaz: 0, jayyid_jiddan: 0, jayyid: 0, maqbul: 0, dhaif: 0 };
-
-            students.forEach(s => {
-                const score = s.finalScore;
-                sum += score;
-                if (score > max) max = score;
-                if (score < min) min = score;
-
-                const cat = getCategoryDetails(Math.round(score));
-                if (dist[cat.key] !== undefined) dist[cat.key]++;
+            let m = 0, jj = 0, j = 0, mq = 0, df = 0;
+            localStudentsData.forEach(s => {
+                if (s.finalScore >= 86) m++; else if (s.finalScore >= 71) jj++;
+                else if (s.finalScore >= 56) j++; else if (s.finalScore >= 31) mq++; else df++;
             });
-
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-average').innerText = (sum / total).toFixed(1);
-            document.getElementById('stat-max').innerText = max.toFixed(1);
-            document.getElementById('stat-min').innerText = min.toFixed(1);
-
-            document.getElementById('dist-mumtaz').innerText = dist.mumtaz;
-            document.getElementById('dist-jj').innerText = dist.jayyid_jiddan;
-            document.getElementById('dist-jayyid').innerText = dist.jayyid;
-            document.getElementById('dist-maqbul').innerText = dist.maqbul;
-            document.getElementById('dist-dhaif').innerText = dist.dhaif;
+            document.getElementById('dist-mumtaz').textContent = m; document.getElementById('dist-jj').textContent = jj; document.getElementById('dist-jayyid').textContent = j; document.getElementById('dist-maqbul').textContent = mq; document.getElementById('dist-dhaif').textContent = df;
         }
 
-        // Memasukkan Data ke Form untuk Diubah
-        function editStudent(id) {
-            const item = students.find(s => s.id === id);
-            if (!item) return;
-            document.getElementById('edit-id').value = item.id;
-            document.getElementById('student-name').value = item.name;
-            document.getElementById('student-nim').value = item.nim === '-' ? '' : item.nim;
-            document.getElementById('score-c1').value = item.c1;
-            document.getElementById('score-c2').value = item.c2;
-            document.getElementById('score-c3').value = item.c3;
-            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-emerald-600 text-lg"></i> Ubah Penilaian Mahasiswi`;
-            document.getElementById('btn-submit').innerHTML = `<i class="fa-solid fa-check"></i> Perbarui Penilaian`;
-            updateScores();
-            switchTab('input-tab');
-            showToast(`Form diisi dengan data ${item.name}`);
-        }
-
-        // Menghapus Data Mahasiswi Individu
-        async function deleteStudent(id) {
-            const item = students.find(s => s.id === id);
-            if (!item) return;
-            
-            if (isFirebaseActive && db) {
-                try {
-                    await remove(ref(db, 'students/' + id));
-                    showToast(`Data ${item.name} berhasil dihapus dari cloud database!`);
-                } catch (err) {
-                    console.error("Gagal menghapus online:", err);
-                    showToast("Gagal menghapus dari database online.");
-                }
-            } else {
-                students = students.filter(s => s.id !== id);
-                localStorage.setItem('mahasiswi_grades', JSON.stringify(students));
-                renderStudents();
-                updateStats();
-                showToast(`Data ${item.name} berhasil dihapus lokal!`);
-            }
-        }
-
-        // Kontrol Modal Konfirmasi Hapus Masal
-        function confirmClearAll() {
-            document.getElementById('delete-modal').classList.remove('hidden');
-        }
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').classList.add('hidden');
-        }
-
-        // Mengosongkan Seluruh Data Terdaftar
-        async function clearAllData() {
-            if (isFirebaseActive && db) {
-                try {
-                    await remove(ref(db, 'students'));
-                    showToast("Semua data berhasil dibersihkan dari cloud database!");
-                } catch (err) {
-                    console.error("Gagal membersihkan online:", err);
-                    showToast("Gagal mengosongkan cloud database.");
-                }
-            } else {
-                students = [];
-                localStorage.removeItem('mahasiswi_grades');
-                renderStudents();
-                updateStats();
-                showToast("Semua data lokal berhasil dibersihkan!");
-            }
-            closeDeleteModal();
-        }
-
-        // Mengekspor data ke format berkas .CSV (Excel otomatis terbaca rapi)
         function exportToCSV() {
-            if (students.length === 0) {
-                showToast("Belum ada data untuk diekspor!");
+            if (localStudentsData.length === 0) {
+                showToast("Tidak ada data untuk diekspor!", "error");
                 return;
             }
             let csvContent = "\uFEFF"; 
-            csvContent += "NIM,Nama Mahasiswi,1. Teologi & Filsafat (40%),2. Istilah Ilmiah (30%),3. Bahasa & Nahwu (30%),Skor Akhir,Kategori\n";
-            
-            students.forEach(s => {
-                const cat = getCategoryDetails(Math.round(s.finalScore)).name;
-                const row = [
-                    `"${s.nim}"`,
-                    `"${s.name}"`,
-                    s.c1,
-                    s.c2,
-                    s.c3,
-                    s.finalScore.toFixed(1),
-                    `"${cat}"`
-                ];
-                csvContent += row.join(",") + "\n";
+            csvContent += `Rekap Penilaian Kelas: ,${currentSelectedClass}\n`;
+            csvContent += "Nama Mahasiswi,NIM,Struktur Teologi Filsafat (40%),Penerapan Istilah Ilmiah (30%),Struktur Bahasa Nahwu (30%),Skor Akhir\n";
+            localStudentsData.forEach(s => {
+                csvContent += `"${s.name}","${s.nim}",${s.c1},${s.c2},${s.c3},${s.finalScore.toFixed(1)}\n`;
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", `Rekap_Nilai_Mahasiswi_${new Date().toISOString().slice(0, 10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Berhasil mengekspor rekap nilai ke CSV!");
+            link.setAttribute("download", `Rekap_Nilai_${currentSelectedClass.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast("Berhasil mengunduh file Excel/CSV!", "success");
         }
 
-        // Bind elemen ke scope global agar HTML inline onclick tetap berjalan normal
-        window.switchTab = switchTab;
-        window.setScore = setScore;
-        window.resetForm = resetForm;
-        window.saveStudent = saveStudent;
-        window.editStudent = editStudent;
-        window.deleteStudent = deleteStudent;
-        window.confirmClearAll = confirmClearAll;
-        window.closeDeleteModal = closeDeleteModal;
-        window.clearAllData = clearAllData;
-        window.exportToCSV = exportToCSV;
-        window.updateScores = updateScores;
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = "bg-slate-900 text-white";
+            if (type === 'error') bgClass = "bg-rose-600 text-white";
+            else if (type === 'info') bgClass = "bg-blue-600 text-white";
+            toast.className = `${bgClass} px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold pointer-events-auto`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
 
-        // Listener input pencarian
+        window.switchTab = switchTab; window.setScore = setScore; window.resetForm = resetForm;
+        window.saveStudent = saveStudent; window.editStudent = editStudent; window.deleteStudent = deleteStudent;
+        window.confirmClearAll = confirmClearAll; window.closeDeleteModal = closeDeleteModal; window.clearAllData = clearAllData;
+        window.exportToCSV = exportToCSV; window.updateScores = updateScores; window.handleClassChange = handleClassChange;
+        window.openAddClassModal = openAddClassModal; window.closeAddClassModal = closeAddClassModal; window.addNewClassSubmit = addNewClassSubmit;
+
         document.getElementById('search-input').addEventListener('input', renderStudents);
         document.getElementById('student-name').addEventListener('input', updateScores);
 
-        // Eksekusi boot awal saat web dibuka
-        window.addEventListener('DOMContentLoaded', () => {
-            initializeDatabase();
-            updateScores();
-        });
+        window.addEventListener('DOMContentLoaded', () => { initializeDatabase(); updateScores(); });
     </script>
 </body>
 </html>
